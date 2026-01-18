@@ -1,0 +1,54 @@
+{
+  "STREAM_PACER": {
+    "Title": "Scene Pacing",
+    "SceneControl": "Stream Pacer",
+    "NoPlayers": "No active players",
+    "YourStatus": "Your Status",
+
+    "Status": {
+      "engaged": "Engaged - actively participating",
+      "hand_raised": "Hand Raised - I want to do/say something",
+      "need_time": "Need Time - I'm still thinking/processing",
+      "ready": "Ready - done with scene"
+    },
+
+    "StatusShort": {
+      "engaged": "Engaged",
+      "hand_raised": "Hand Up",
+      "need_time": "Thinking",
+      "ready": "Ready"
+    },
+
+    "SoftSignal": "Soft Signal",
+    "SoftSignalTooltip": "Send a gentle nudge that you'd like to wrap up",
+    "SoftSignalMessage": "GM would like to wrap up",
+
+    "Countdown": "Countdown",
+    "CountdownTooltip": "Start a countdown timer for scene ending",
+    "CountdownMessage": "Scene ending in:",
+    "CountdownDuration": "Countdown Duration",
+    "StartCountdown": "Start Countdown",
+    "Start": "Start",
+    "Minutes": "minutes",
+
+    "FloorOpen": "Open Floor",
+    "FloorOpenTooltip": "Open the floor for player actions - raise your hand",
+    "FloorOpenMessage": "Floor is open - raise your hand",
+
+    "Cancel": "Cancel",
+    "CancelTooltip": "Cancel the current signal",
+
+    "Reset": "Reset",
+    "ResetTooltip": "Reset all player statuses",
+
+    "Settings": {
+      "DefaultCountdown": "Default Countdown Duration",
+      "DefaultCountdownHint": "Default duration in seconds for the countdown timer (1-10 minutes)",
+      "ResetOnSceneChange": "Reset on Scene Change",
+      "ResetOnSceneChangeHint": "Automatically reset all player statuses when the scene changes",
+      "ExemptUsers": "Exempt Users",
+      "ExemptUsersLabel": "Configure Exempt Users",
+      "ExemptUsersHint": "Select users who will not see the Stream Pacer UI (useful for streaming overlays or bots)"
+    }
+  }
+}

@@ -1,0 +1,16 @@
+<form>
+  <p class="notes">{{localize "STREAM_PACER.Settings.ExemptUsersHint"}}</p>
+  <div class="form-group">
+    {{#each users}}
+    <div class="form-group">
+      <label class="checkbox">
+        <input type="checkbox" name="user-{{id}}" {{#if isExempt}}checked{{/if}}>
+        {{name}}
+      </label>
+    </div>
+    {{/each}}
+  </div>
+  <footer class="form-footer">
+    <button type="submit"><i class="fas fa-save"></i> {{localize "Save"}}</button>
+  </footer>
+</form>

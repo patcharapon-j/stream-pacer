@@ -1,0 +1,778 @@
+/* Stream Pacer - HUD & Overlay Styles */
+/* Arknights-inspired modern design */
+
+:root {
+  --sp-engaged: #d4a856;
+  --sp-hand-raised: #4a90d9;
+  --sp-need-time: #9b59b6;
+  --sp-ready: #4a9c6d;
+  --sp-floor-open: #00d4ff;
+  --sp-bg-dark: rgba(20, 24, 28, 0.92);
+  --sp-bg-medium: rgba(30, 35, 42, 0.95);
+  --sp-border: rgba(100, 110, 120, 0.5);
+  --sp-text: #e8e8e8;
+  --sp-text-muted: #8a9199;
+  --sp-warning: #e6a23c;
+  --sp-critical: #f56c6c;
+  --sp-accent-cyan: #00d4ff;
+  --sp-accent-gold: #ffd429;
+}
+
+/* ========================================
+   HUD Container - Left of Chat Box
+   ======================================== */
+
+#stream-pacer-hud {
+  position: fixed !important;
+  bottom: 10px;
+  right: 310px;
+  top: auto !important;
+  left: auto !important;
+  transform: none !important;
+  z-index: 100;
+  pointer-events: auto;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+#stream-pacer-hud > header,
+#stream-pacer-hud > .window-header,
+#stream-pacer-hud > .window-resize-handle {
+  display: none !important;
+}
+
+#stream-pacer-container {
+  background: var(--sp-bg-dark);
+  border: 1px solid var(--sp-border);
+  border-left: 2px solid var(--sp-accent-cyan);
+  border-radius: 2px;
+  font-family: 'Signika', sans-serif;
+  font-size: 11px;
+  color: var(--sp-text);
+  min-width: auto;
+  max-width: 200px;
+  box-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle scan line effect */
+#stream-pacer-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.03) 2px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+#stream-pacer-container.signal-active {
+  border-left-color: var(--sp-accent-gold);
+  box-shadow:
+    0 0 15px rgba(255, 212, 41, 0.15),
+    0 2px 12px rgba(0, 0, 0, 0.4);
+}
+
+#stream-pacer-container.countdown-active {
+  border-left-color: var(--sp-critical);
+}
+
+#stream-pacer-container.countdown-active.urgency-warning {
+  box-shadow:
+    0 0 20px rgba(230, 162, 60, 0.2),
+    0 2px 12px rgba(0, 0, 0, 0.4);
+  animation: pulse-warning 2s ease-in-out infinite;
+}
+
+#stream-pacer-container.countdown-active.urgency-critical {
+  box-shadow:
+    0 0 25px rgba(245, 108, 108, 0.25),
+    0 2px 12px rgba(0, 0, 0, 0.4);
+  animation: pulse-critical 1s ease-in-out infinite;
+}
+
+/* ========================================
+   HUD Header - Compact, Modern
+   ======================================== */
+
+#stream-pacer-container .pacer-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  background: var(--sp-bg-medium);
+  border-bottom: 1px solid var(--sp-border);
+  position: relative;
+  z-index: 2;
+}
+
+#stream-pacer-container .drag-handle {
+  display: none;
+}
+
+#stream-pacer-container .pacer-title {
+  font-weight: 600;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  flex: 1;
+  color: var(--sp-text-muted);
+}
+
+#stream-pacer-container .gm-badge {
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(0, 212, 255, 0.1));
+  border: 1px solid var(--sp-accent-cyan);
+  color: var(--sp-accent-cyan);
+  font-size: 7px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 1px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ========================================
+   Player Status Bar - Icon + Name Chips
+   ======================================== */
+
+#stream-pacer-container .pacer-players {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--sp-border);
+  position: relative;
+  z-index: 2;
+}
+
+#stream-pacer-container .player-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 6px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 9px;
+  transition: all 0.2s ease;
+  border-left: 2px solid transparent;
+}
+
+#stream-pacer-container .player-status i {
+  font-size: 9px;
+}
+
+#stream-pacer-container .player-status.status-engaged {
+  border-left-color: var(--sp-engaged);
+}
+
+#stream-pacer-container .player-status.status-engaged i {
+  color: var(--sp-engaged);
+}
+
+#stream-pacer-container .player-status.status-hand-raised {
+  border-left-color: var(--sp-hand-raised);
+  background: linear-gradient(
+    135deg,
+    rgba(74, 144, 217, 0.25) 0%,
+    rgba(100, 180, 255, 0.2) 50%,
+    rgba(74, 144, 217, 0.25) 100%
+  );
+  box-shadow:
+    0 0 12px rgba(74, 144, 217, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  animation: pulse-hand-raised 1.5s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+#stream-pacer-container .player-status.status-hand-raised::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.4) 50%,
+    transparent 100%
+  );
+  animation: hand-raised-shimmer 2s ease-in-out infinite;
+}
+
+#stream-pacer-container .player-status.status-hand-raised i {
+  color: var(--sp-hand-raised);
+  filter: drop-shadow(0 0 3px rgba(74, 144, 217, 0.6));
+  animation: hand-icon-glow 1.5s ease-in-out infinite;
+}
+
+#stream-pacer-container .player-status.status-ready {
+  border-left-color: var(--sp-ready);
+  background: rgba(74, 156, 109, 0.1);
+}
+
+#stream-pacer-container .player-status.status-ready i {
+  color: var(--sp-ready);
+}
+
+#stream-pacer-container .player-status.status-need-time {
+  border-left-color: var(--sp-need-time);
+  background: rgba(155, 89, 182, 0.1);
+}
+
+#stream-pacer-container .player-status.status-need-time i {
+  color: var(--sp-need-time);
+}
+
+#stream-pacer-container .player-name {
+  max-width: 50px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--sp-text);
+}
+
+#stream-pacer-container .no-players {
+  color: var(--sp-text-muted);
+  font-style: italic;
+  font-size: 9px;
+}
+
+/* ========================================
+   Player Status Buttons - Icons Only
+   ======================================== */
+
+#stream-pacer-container .pacer-my-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border-bottom: 1px solid var(--sp-border);
+  position: relative;
+  z-index: 2;
+}
+
+#stream-pacer-container .status-label {
+  display: none;
+}
+
+#stream-pacer-container .status-buttons {
+  display: flex;
+  gap: 3px;
+  flex: 1;
+}
+
+#stream-pacer-container .status-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  border: 1px solid var(--sp-border);
+  border-radius: 1px;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--sp-text-muted);
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex: 1;
+}
+
+#stream-pacer-container .status-btn span {
+  display: none;
+}
+
+#stream-pacer-container .status-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--sp-text);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+#stream-pacer-container .status-btn.status-hand-raised:hover:not(.active) {
+  background: rgba(74, 144, 217, 0.1);
+  border-color: rgba(74, 144, 217, 0.5);
+  color: var(--sp-hand-raised);
+  box-shadow: 0 0 10px rgba(74, 144, 217, 0.3);
+}
+
+#stream-pacer-container .status-btn.status-engaged.active {
+  background: rgba(212, 168, 86, 0.15);
+  border-color: var(--sp-engaged);
+  color: var(--sp-engaged);
+  box-shadow: 0 0 8px rgba(212, 168, 86, 0.3);
+}
+
+#stream-pacer-container .status-btn.status-hand-raised.active {
+  background: linear-gradient(
+    135deg,
+    rgba(74, 144, 217, 0.2) 0%,
+    rgba(100, 180, 255, 0.15) 50%,
+    rgba(74, 144, 217, 0.2) 100%
+  );
+  border-color: var(--sp-hand-raised);
+  color: var(--sp-hand-raised);
+  box-shadow:
+    0 0 15px rgba(74, 144, 217, 0.5),
+    0 0 30px rgba(74, 144, 217, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  animation: pulse-hand-raised-btn 1.5s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+#stream-pacer-container .status-btn.status-hand-raised.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  animation: hand-raised-shimmer 2s ease-in-out infinite;
+}
+
+#stream-pacer-container .status-btn.status-hand-raised.active i {
+  filter: drop-shadow(0 0 4px rgba(74, 144, 217, 0.8));
+}
+
+#stream-pacer-container .status-btn.status-ready.active {
+  background: rgba(74, 156, 109, 0.15);
+  border-color: var(--sp-ready);
+  color: var(--sp-ready);
+  box-shadow: 0 0 8px rgba(74, 156, 109, 0.3);
+}
+
+#stream-pacer-container .status-btn.status-need-time.active {
+  background: rgba(155, 89, 182, 0.15);
+  border-color: var(--sp-need-time);
+  color: var(--sp-need-time);
+  box-shadow: 0 0 8px rgba(155, 89, 182, 0.3);
+}
+
+/* ========================================
+   GM Signal Display - Compact
+   ======================================== */
+
+#stream-pacer-container .pacer-signal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 8px;
+  font-weight: 600;
+  font-size: 10px;
+  text-align: center;
+  position: relative;
+  z-index: 2;
+}
+
+#stream-pacer-container .pacer-signal.soft-signal {
+  background: rgba(255, 212, 41, 0.1);
+  color: var(--sp-accent-gold);
+}
+
+#stream-pacer-container .pacer-signal.hard-signal {
+  background: rgba(245, 108, 108, 0.1);
+  color: var(--sp-critical);
+}
+
+#stream-pacer-container .pacer-signal.floor-open-signal {
+  background: rgba(0, 212, 255, 0.1);
+  color: var(--sp-floor-open);
+}
+
+#stream-pacer-container .countdown-timer {
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  margin-left: 2px;
+}
+
+.urgency-warning .countdown-timer {
+  color: var(--sp-warning);
+}
+
+.urgency-critical .countdown-timer {
+  color: var(--sp-critical);
+  animation: flash-critical 0.5s ease-in-out infinite;
+}
+
+/* ========================================
+   GM Controls - Icons Only
+   ======================================== */
+
+#stream-pacer-container .pacer-gm-controls {
+  display: flex;
+  gap: 3px;
+  padding: 5px 8px;
+  flex-wrap: nowrap;
+  position: relative;
+  z-index: 2;
+}
+
+#stream-pacer-container .gm-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  border: 1px solid var(--sp-border);
+  border-radius: 1px;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--sp-text);
+  font-size: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+#stream-pacer-container .gm-btn span {
+  display: none;
+}
+
+#stream-pacer-container .gm-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+#stream-pacer-container .gm-btn i {
+  font-size: 10px;
+}
+
+#stream-pacer-container .soft-signal-btn:hover,
+#stream-pacer-container .soft-signal-btn.active {
+  border-color: var(--sp-accent-gold);
+  color: var(--sp-accent-gold);
+  background: rgba(255, 212, 41, 0.1);
+}
+
+#stream-pacer-container .countdown-btn:hover,
+#stream-pacer-container .countdown-btn.active {
+  border-color: var(--sp-critical);
+  color: var(--sp-critical);
+  background: rgba(245, 108, 108, 0.1);
+}
+
+#stream-pacer-container .floor-open-btn:hover,
+#stream-pacer-container .floor-open-btn.active {
+  border-color: var(--sp-floor-open);
+  color: var(--sp-floor-open);
+  background: rgba(0, 212, 255, 0.1);
+}
+
+#stream-pacer-container .cancel-btn {
+  border-color: var(--sp-text-muted);
+}
+
+#stream-pacer-container .cancel-btn:hover {
+  border-color: var(--sp-critical);
+  color: var(--sp-critical);
+}
+
+#stream-pacer-container .reset-btn {
+  margin-left: auto;
+}
+
+/* ========================================
+   Ticker Overlay - Arknights Style
+   Canvas level, semi-transparent
+   ======================================== */
+
+.stream-pacer-overlay {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 36px;
+  pointer-events: none;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease, visibility 0.4s ease;
+  overflow: hidden;
+}
+
+.stream-pacer-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Semi-transparent backgrounds with gradient edges */
+.stream-pacer-overlay.soft-signal {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 212, 41, 0.75) 5%,
+    rgba(255, 212, 41, 0.75) 95%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 30px rgba(255, 212, 41, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.stream-pacer-overlay.countdown-signal {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(245, 80, 80, 0.75) 5%,
+    rgba(245, 80, 80, 0.75) 95%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 30px rgba(245, 108, 108, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.stream-pacer-overlay.floor-open-signal {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 212, 255, 0.75) 5%,
+    rgba(0, 212, 255, 0.75) 95%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 30px rgba(0, 212, 255, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.stream-pacer-overlay.urgency-warning {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(230, 162, 60, 0.8) 5%,
+    rgba(230, 162, 60, 0.8) 95%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 40px rgba(230, 162, 60, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+.stream-pacer-overlay.urgency-critical {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(245, 60, 60, 0.85) 5%,
+    rgba(245, 60, 60, 0.85) 95%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 50px rgba(245, 108, 108, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  animation: ticker-glow 1s ease-in-out infinite;
+}
+
+/* Scan line overlay effect */
+.stream-pacer-overlay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 1px,
+    rgba(0, 0, 0, 0.05) 1px,
+    rgba(0, 0, 0, 0.05) 2px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Shimmer effect */
+.stream-pacer-overlay::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.15),
+    transparent
+  );
+  animation: shimmer 4s ease-in-out infinite;
+  z-index: 2;
+}
+
+.stream-pacer-overlay .overlay-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0;
+  padding: 0;
+  white-space: nowrap;
+  animation: ticker-scroll 30s linear infinite;
+  position: relative;
+  z-index: 3;
+}
+
+.stream-pacer-overlay .ticker-segment {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+}
+
+.stream-pacer-overlay .ticker-separator {
+  width: 6px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.8);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+.stream-pacer-overlay .overlay-icon {
+  font-size: 16px;
+  color: white;
+  flex-shrink: 0;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.stream-pacer-overlay .overlay-message {
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.stream-pacer-overlay .overlay-countdown {
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  color: white;
+  flex-shrink: 0;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  letter-spacing: 1px;
+}
+
+.stream-pacer-overlay.urgency-critical .overlay-countdown {
+  animation: flash-critical 0.5s ease-in-out infinite;
+}
+
+/* ========================================
+   Animations
+   ======================================== */
+
+@keyframes pulse-hand-raised {
+  0%, 100% {
+    box-shadow:
+      0 0 12px rgba(74, 144, 217, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(74, 144, 217, 0.6),
+      0 0 35px rgba(74, 144, 217, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.35),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.1);
+  }
+}
+
+@keyframes pulse-hand-raised-btn {
+  0%, 100% {
+    box-shadow:
+      0 0 15px rgba(74, 144, 217, 0.5),
+      0 0 30px rgba(74, 144, 217, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(74, 144, 217, 0.7),
+      0 0 40px rgba(74, 144, 217, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+}
+
+@keyframes hand-raised-shimmer {
+  0% {
+    left: -100%;
+  }
+  50%, 100% {
+    left: 200%;
+  }
+}
+
+@keyframes hand-icon-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 3px rgba(74, 144, 217, 0.6));
+  }
+  50% {
+    filter: drop-shadow(0 0 6px rgba(74, 144, 217, 0.9));
+  }
+}
+
+@keyframes pulse-warning {
+  0%, 100% { box-shadow: 0 0 15px rgba(230, 162, 60, 0.2), 0 2px 12px rgba(0, 0, 0, 0.4); }
+  50% { box-shadow: 0 0 25px rgba(230, 162, 60, 0.35), 0 2px 12px rgba(0, 0, 0, 0.4); }
+}
+
+@keyframes pulse-critical {
+  0%, 100% { box-shadow: 0 0 18px rgba(245, 108, 108, 0.2), 0 2px 12px rgba(0, 0, 0, 0.4); }
+  50% { box-shadow: 0 0 30px rgba(245, 108, 108, 0.4), 0 2px 12px rgba(0, 0, 0, 0.4); }
+}
+
+@keyframes ticker-glow {
+  0%, 100% {
+    box-shadow:
+      0 0 40px rgba(245, 108, 108, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  }
+  50% {
+    box-shadow:
+      0 0 60px rgba(245, 108, 108, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  }
+}
+
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes shimmer {
+  0% { left: -50%; }
+  50%, 100% { left: 150%; }
+}
+
+@keyframes flash-critical {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
