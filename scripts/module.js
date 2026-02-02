@@ -3,9 +3,13 @@ import { PacerManager } from './PacerManager.js';
 import { SocketHandler } from './socket-handler.js';
 import { PacerHUD } from './PacerHUD.js';
 import { PacerOverlay } from './PacerOverlay.js';
+import { AudioManager } from './AudioManager.js';
+import { HandRaiseSidebar } from './HandRaiseSidebar.js';
 
 let pacerHUD = null;
 let pacerOverlay = null;
+let audioManager = null;
+let handRaiseSidebar = null;
 let isReady = false;
 let isFirstCanvas = true;
 
@@ -39,12 +43,29 @@ Hooks.once('ready', () => {
     pacerOverlay.initialize();
   }
 
+  // Initialize GM-only components
+  if (game.user.isGM) {
+    // Audio manager for hand-raise notifications
+    audioManager = new AudioManager();
+
+    // Subscribe to hand raise events for audio cue
+    PacerManager.onHandRaise((userId) => {
+      audioManager.playHandRaiseChime(userId);
+    });
+
+    // Hand raise sidebar (GM-only prominent notification)
+    handRaiseSidebar = new HandRaiseSidebar();
+    handRaiseSidebar.initialize();
+  }
+
   // Expose global API
   game.streamPacer = {
     manager: PacerManager,
     socket: SocketHandler,
     hud: pacerHUD,
-    overlay: pacerOverlay
+    overlay: pacerOverlay,
+    audio: audioManager,
+    handSidebar: handRaiseSidebar
   };
 });
 

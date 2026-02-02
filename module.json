@@ -2,7 +2,7 @@
   "id": "stream-pacer",
   "title": "Stream Pacer",
   "description": "A communication tool for GMs and players to signal scene readiness and pacing during gameplay, optimized for streaming.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "authors": [
     {
       "name": "Patcharapon Joksamut"

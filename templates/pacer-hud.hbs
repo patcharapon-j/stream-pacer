@@ -1,6 +1,9 @@
 <div id="stream-pacer-container" class="{{#if hasActiveSignal}}signal-active{{/if}} {{#if isCountdown}}countdown-active urgency-{{countdownUrgency}}{{/if}}">
   {{!-- Header --}}
   <div class="pacer-header">
+    <div class="drag-handle" title="{{localize 'STREAM_PACER.DragToMove'}}">
+      <i class="fas fa-grip-vertical"></i>
+    </div>
     <span class="pacer-title">{{localize "STREAM_PACER.Title"}}</span>
     {{#if isGM}}
     <div class="gm-badge">GM</div>

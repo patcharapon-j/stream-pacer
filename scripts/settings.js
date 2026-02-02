@@ -79,7 +79,32 @@ export function registerSettings() {
     scope: 'client',
     config: false,
     type: Object,
-    default: { top: 10 }
+    default: { left: null, top: null }
+  });
+
+  // Hand raise audio notification enabled (GM only setting)
+  game.settings.register(MODULE_ID, 'handRaiseAudioEnabled', {
+    name: game.i18n.localize('STREAM_PACER.Settings.HandRaiseAudioEnabled'),
+    hint: game.i18n.localize('STREAM_PACER.Settings.HandRaiseAudioEnabledHint'),
+    scope: 'client',
+    config: true,
+    type: Boolean,
+    default: true
+  });
+
+  // Hand raise audio volume (0-1)
+  game.settings.register(MODULE_ID, 'handRaiseAudioVolume', {
+    name: game.i18n.localize('STREAM_PACER.Settings.HandRaiseAudioVolume'),
+    hint: game.i18n.localize('STREAM_PACER.Settings.HandRaiseAudioVolumeHint'),
+    scope: 'client',
+    config: true,
+    type: Number,
+    default: 0.5,
+    range: {
+      min: 0,
+      max: 1,
+      step: 0.1
+    }
   });
 }
 

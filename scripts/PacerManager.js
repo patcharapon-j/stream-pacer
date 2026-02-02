@@ -8,6 +8,7 @@ class PacerManagerClass {
     this._countdownEnd = null;
     this._countdownInterval = null;
     this._subscribers = new Set();
+    this._handRaiseCallbacks = new Set();
     this._notifyPending = false;
   }
 
@@ -23,6 +24,30 @@ class PacerManagerClass {
   subscribe(callback) {
     this._subscribers.add(callback);
     return () => this._subscribers.delete(callback);
+  }
+
+  /**
+   * Register a callback for hand-raise events
+   * @param {Function} callback - Called with userId when a player raises their hand
+   * @returns {Function} Unsubscribe function
+   */
+  onHandRaise(callback) {
+    this._handRaiseCallbacks.add(callback);
+    return () => this._handRaiseCallbacks.delete(callback);
+  }
+
+  /**
+   * Notify all hand-raise callbacks
+   * @param {string} userId - The user who raised their hand
+   */
+  _notifyHandRaise(userId) {
+    for (const callback of this._handRaiseCallbacks) {
+      try {
+        callback(userId);
+      } catch (e) {
+        console.error(`${MODULE_ID} | Hand raise callback error:`, e);
+      }
+    }
   }
 
   _notifySubscribers() {
@@ -87,7 +112,13 @@ class PacerManagerClass {
   // --- Player Actions ---
 
   setPlayerStatus(userId, status, broadcast = true) {
+    const previousStatus = this._playerStates[userId];
     this._playerStates[userId] = status;
+
+    // Detect hand raise event (status changed TO hand_raised)
+    if (status === PLAYER_STATUS.HAND_RAISED && previousStatus !== PLAYER_STATUS.HAND_RAISED) {
+      this._notifyHandRaise(userId);
+    }
 
     if (broadcast) {
       SocketHandler.emitPlayerStatusChange(userId, status);
@@ -181,7 +212,14 @@ class PacerManagerClass {
   // --- State Sync (for socket updates) ---
 
   receivePlayerStatusChange(userId, status) {
+    const previousStatus = this._playerStates[userId];
     this._playerStates[userId] = status;
+
+    // Detect hand raise event from remote player
+    if (status === PLAYER_STATUS.HAND_RAISED && previousStatus !== PLAYER_STATUS.HAND_RAISED) {
+      this._notifyHandRaise(userId);
+    }
+
     this._notifySubscribers();
     if (game.user.isGM) {
       this._saveToSettings();

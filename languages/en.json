@@ -4,6 +4,9 @@
     "SceneControl": "Stream Pacer",
     "NoPlayers": "No active players",
     "YourStatus": "Your Status",
+    "HandsRaised": "Hands Raised",
+    "HasHandRaised": "has their hand raised!",
+    "DragToMove": "Drag to move",
 
     "Status": {
       "engaged": "Engaged - actively participating",
@@ -48,7 +51,11 @@
       "ResetOnSceneChangeHint": "Automatically reset all player statuses when the scene changes",
       "ExemptUsers": "Exempt Users",
       "ExemptUsersLabel": "Configure Exempt Users",
-      "ExemptUsersHint": "Select users who will not see the Stream Pacer UI (useful for streaming overlays or bots)"
+      "ExemptUsersHint": "Select users who will not see the Stream Pacer UI (useful for streaming overlays or bots)",
+      "HandRaiseAudioEnabled": "Hand Raise Audio Notification",
+      "HandRaiseAudioEnabledHint": "Play a chime sound when a player raises their hand (GM only)",
+      "HandRaiseAudioVolume": "Hand Raise Audio Volume",
+      "HandRaiseAudioVolumeHint": "Volume level for the hand raise notification chime (0 = mute, 1 = full volume)"
     }
   }
 }

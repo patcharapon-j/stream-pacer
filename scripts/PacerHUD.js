@@ -7,6 +7,16 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
   constructor(options = {}) {
     super(options);
     this._unsubscribe = null;
+    this._isDragging = false;
+    this._dragStartX = 0;
+    this._dragStartY = 0;
+    this._elementStartLeft = 0;
+    this._elementStartTop = 0;
+    this._boundOnMouseMove = this._onMouseMove.bind(this);
+    this._boundOnMouseUp = this._onMouseUp.bind(this);
+    this._positionRestored = false;
+    this._currentLeft = null;
+    this._currentTop = null;
   }
 
   static DEFAULT_OPTIONS = {
@@ -128,6 +138,18 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
   _onRender(context, options) {
     super._onRender(context, options);
     this._setupListeners();
+    
+    // Setup drag listeners (needs to happen after each render since template is rebuilt)
+    this._setupDragListeners();
+    
+    // Restore saved position (only on first render) or re-apply current position
+    if (!this._positionRestored) {
+      this._restorePosition();
+      this._positionRestored = true;
+    } else {
+      // Re-apply position after re-render
+      this._reapplyPosition();
+    }
   }
 
   _setupListeners() {
@@ -213,6 +235,153 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
       this._unsubscribe();
       this._unsubscribe = null;
     }
+    // Clean up drag listeners
+    document.removeEventListener('mousemove', this._boundOnMouseMove);
+    document.removeEventListener('mouseup', this._boundOnMouseUp);
     super._onClose(options);
+  }
+
+  /**
+   * Setup drag functionality for the HUD
+   */
+  _setupDragListeners() {
+    const dragHandle = this.element.querySelector('.drag-handle');
+    if (!dragHandle) return;
+
+    dragHandle.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      this._isDragging = true;
+      this._dragStartX = e.clientX;
+      this._dragStartY = e.clientY;
+
+      // Get current position
+      const rect = this.element.getBoundingClientRect();
+      this._elementStartLeft = rect.left;
+      this._elementStartTop = rect.top;
+
+      // Add dragging class
+      this.element.classList.add('dragging');
+
+      // Add document listeners
+      document.addEventListener('mousemove', this._boundOnMouseMove);
+      document.addEventListener('mouseup', this._boundOnMouseUp);
+    });
+  }
+
+  /**
+   * Handle mouse move during drag
+   */
+  _onMouseMove(e) {
+    if (!this._isDragging) return;
+
+    const deltaX = e.clientX - this._dragStartX;
+    const deltaY = e.clientY - this._dragStartY;
+
+    let newLeft = this._elementStartLeft + deltaX;
+    let newTop = this._elementStartTop + deltaY;
+
+    // Constrain to viewport
+    const rect = this.element.getBoundingClientRect();
+    const maxLeft = window.innerWidth - rect.width;
+    const maxTop = window.innerHeight - rect.height;
+
+    newLeft = Math.max(0, Math.min(newLeft, maxLeft));
+    newTop = Math.max(0, Math.min(newTop, maxTop));
+
+    // Store current position
+    this._currentLeft = newLeft;
+    this._currentTop = newTop;
+
+    // Apply position with positioned class
+    this.element.classList.add('positioned');
+    this.element.style.left = `${newLeft}px`;
+    this.element.style.top = `${newTop}px`;
+  }
+
+  /**
+   * Handle mouse up to end drag
+   */
+  _onMouseUp() {
+    if (!this._isDragging) return;
+
+    this._isDragging = false;
+    this.element.classList.remove('dragging');
+
+    // Remove document listeners
+    document.removeEventListener('mousemove', this._boundOnMouseMove);
+    document.removeEventListener('mouseup', this._boundOnMouseUp);
+
+    // Save position
+    this._savePosition();
+  }
+
+  /**
+   * Save current position to settings
+   */
+  _savePosition() {
+    const rect = this.element.getBoundingClientRect();
+    game.settings.set(MODULE_ID, 'hudPosition', {
+      left: rect.left,
+      top: rect.top
+    });
+  }
+
+  /**
+   * Restore position from settings
+   */
+  _restorePosition() {
+    try {
+      const pos = game.settings.get(MODULE_ID, 'hudPosition');
+      if (pos && pos.left !== null && pos.top !== null) {
+        // Validate position is within viewport
+        const rect = this.element.getBoundingClientRect();
+        let left = pos.left;
+        let top = pos.top;
+
+        // Constrain to current viewport
+        const maxLeft = window.innerWidth - rect.width;
+        const maxTop = window.innerHeight - rect.height;
+
+        left = Math.max(0, Math.min(left, maxLeft));
+        top = Math.max(0, Math.min(top, maxTop));
+
+        // Store and apply position
+        this._currentLeft = left;
+        this._currentTop = top;
+        
+        this.element.classList.add('positioned');
+        this.element.style.left = `${left}px`;
+        this.element.style.top = `${top}px`;
+      }
+    } catch (e) {
+      console.warn(`${MODULE_ID} | Failed to restore HUD position:`, e);
+    }
+  }
+
+  /**
+   * Re-apply saved position after re-render
+   */
+  _reapplyPosition() {
+    if (this._currentLeft !== null && this._currentTop !== null) {
+      this.element.classList.add('positioned');
+      this.element.style.left = `${this._currentLeft}px`;
+      this.element.style.top = `${this._currentTop}px`;
+    }
+  }
+
+  /**
+   * Override setPosition to prevent FoundryVTT from resetting our custom position
+   * This is called internally by ApplicationV2 during render cycles
+   */
+  setPosition(position = {}) {
+    // If we have a custom position set, ignore any position changes from the framework
+    if (this._currentLeft !== null && this._currentTop !== null) {
+      // Re-apply our saved position instead
+      this._reapplyPosition();
+      return;
+    }
+    
+    // Otherwise, let the parent handle it normally
+    return super.setPosition(position);
   }
 }
