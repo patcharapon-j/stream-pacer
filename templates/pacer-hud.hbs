@@ -3,49 +3,62 @@
   {{!-- Header --}}
   <div class="pacer-header">
     <div class="drag-handle" title="{{localize 'STREAM_PACER.DragToMove'}}">
-      <i class="fas fa-grip-vertical"></i>
+      <i class="fa-solid fa-grip-vertical"></i>
     </div>
+    <span class="p-ix">01</span>
     <span class="pacer-title">{{localize "STREAM_PACER.Title"}}</span>
     {{#if isGM}}
     <div class="gm-badge">GM</div>
     {{/if}}
   </div>
 
-  {{!-- Player Status Bar --}}
-  <div class="pacer-players">
-    {{#each players}}
-    <div class="player-status {{statusClass}}" title="{{name}}: {{statusTitle}}">
-      <i class="fas {{statusIcon}}"></i>
-      <span class="player-name">{{name}}</span>
+  {{!-- Operators Section --}}
+  <div class="p-sec">
+    <div class="p-lbl">
+      <span class="num">01</span>
+      <span>{{localize "STREAM_PACER.SectionOperators"}}</span>
+      <span class="rule"></span>
     </div>
-    {{else}}
-    <div class="no-players">{{localize "STREAM_PACER.NoPlayers"}}</div>
-    {{/each}}
+    <div class="pacer-players">
+      {{#each players}}
+      <div class="player-status {{statusClass}}" title="{{name}}: {{statusTitle}}">
+        <i class="fa-solid {{statusIcon}}"></i>
+        <span class="player-name">{{name}}</span>
+      </div>
+      {{else}}
+      <div class="no-players">{{localize "STREAM_PACER.NoPlayers"}}</div>
+      {{/each}}
+    </div>
   </div>
 
   {{!-- Player Status Buttons (non-GM only) --}}
   {{#unless isGM}}
-  <div class="pacer-my-status">
+  <div class="p-sec pacer-my-status">
+    <div class="p-lbl">
+      <span class="num">02</span>
+      <span>{{localize "STREAM_PACER.SectionStatus"}}</span>
+      <span class="rule"></span>
+    </div>
     <div class="status-buttons">
       <button type="button" class="status-btn status-engaged {{#if myStatusEngaged}}active{{/if}}"
               data-action="set-status" data-status="engaged"
               title="{{localize 'STREAM_PACER.Status.engaged'}}">
-        <i class="fas fa-hourglass"></i>
+        <i class="fa-solid fa-hourglass-half"></i>
       </button>
       <button type="button" class="status-btn status-hand-raised {{#if myStatusHandRaised}}active{{/if}}"
               data-action="set-status" data-status="hand_raised"
               title="{{localize 'STREAM_PACER.Status.hand_raised'}}">
-        <i class="fas fa-hand-paper"></i>
+        <i class="fa-solid fa-hand"></i>
       </button>
       <button type="button" class="status-btn status-need-time {{#if myStatusNeedTime}}active{{/if}}"
               data-action="set-status" data-status="need_time"
               title="{{localize 'STREAM_PACER.Status.need_time'}}">
-        <i class="fas fa-brain"></i>
+        <i class="fa-solid fa-brain"></i>
       </button>
       <button type="button" class="status-btn status-ready {{#if myStatusReady}}active{{/if}}"
               data-action="set-status" data-status="ready"
               title="{{localize 'STREAM_PACER.Status.ready'}}">
-        <i class="fas fa-check-circle"></i>
+        <i class="fa-solid fa-circle-check"></i>
       </button>
     </div>
   </div>
@@ -70,34 +83,41 @@
 
   {{!-- GM Controls --}}
   {{#if isGM}}
-  <div class="pacer-gm-controls">
-    <button type="button" class="gm-btn soft-signal-btn {{#if isSoftSignal}}active{{/if}}"
-            data-action="soft-signal"
-            title="{{localize 'STREAM_PACER.SoftSignalTooltip'}}">
-      <i class="fas fa-exclamation-triangle"></i>
-    </button>
-    <button type="button" class="gm-btn countdown-btn {{#if isCountdown}}active{{/if}}"
-            data-action="start-countdown"
-            title="{{localize 'STREAM_PACER.CountdownTooltip'}}">
-      <i class="fas fa-clock"></i>
-    </button>
-    <button type="button" class="gm-btn floor-open-btn {{#if isFloorOpen}}active{{/if}}"
-            data-action="open-floor"
-            title="{{localize 'STREAM_PACER.FloorOpenTooltip'}}">
-      <i class="fas fa-microphone"></i>
-    </button>
-    {{#if hasActiveSignal}}
-    <button type="button" class="gm-btn cancel-btn"
-            data-action="cancel-signal"
-            title="{{localize 'STREAM_PACER.CancelTooltip'}}">
-      <i class="fas fa-times"></i>
-    </button>
-    {{/if}}
-    <button type="button" class="gm-btn reset-btn"
-            data-action="reset-all"
-            title="{{localize 'STREAM_PACER.ResetTooltip'}}">
-      <i class="fas fa-redo"></i>
-    </button>
+  <div class="p-sec pacer-gm-controls-wrap">
+    <div class="p-lbl">
+      <span class="num">02</span>
+      <span>{{localize "STREAM_PACER.SectionCommand"}}</span>
+      <span class="rule"></span>
+    </div>
+    <div class="pacer-gm-controls">
+      <button type="button" class="gm-btn soft-signal-btn {{#if isSoftSignal}}active{{/if}}"
+              data-action="soft-signal"
+              title="{{localize 'STREAM_PACER.SoftSignalTooltip'}}">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </button>
+      <button type="button" class="gm-btn countdown-btn {{#if isCountdown}}active{{/if}}"
+              data-action="start-countdown"
+              title="{{localize 'STREAM_PACER.CountdownTooltip'}}">
+        <i class="fa-solid fa-clock"></i>
+      </button>
+      <button type="button" class="gm-btn floor-open-btn {{#if isFloorOpen}}active{{/if}}"
+              data-action="open-floor"
+              title="{{localize 'STREAM_PACER.FloorOpenTooltip'}}">
+        <i class="fa-solid fa-microphone"></i>
+      </button>
+      {{#if hasActiveSignal}}
+      <button type="button" class="gm-btn cancel-btn"
+              data-action="cancel-signal"
+              title="{{localize 'STREAM_PACER.CancelTooltip'}}">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      {{/if}}
+      <button type="button" class="gm-btn reset-btn"
+              data-action="reset-all"
+              title="{{localize 'STREAM_PACER.ResetTooltip'}}">
+        <i class="fa-solid fa-arrows-rotate"></i>
+      </button>
+    </div>
   </div>
   {{/if}}
 </div>
