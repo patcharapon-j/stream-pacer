@@ -1616,6 +1616,7 @@
 }
 
 .stream-pacer-peril-indicator {
+  position: relative;
   min-width: 210px;
   padding: 9px 14px 9px 12px;
   display: flex;

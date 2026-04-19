@@ -11,21 +11,27 @@ const INDICATOR_LEAD_MS = 800;
 
 export class PerilOverlay {
   constructor() {
-    this._stageEl = null;        // persistent container element
-    this._indicatorEl = null;    // persistent container element
+    this._stageEl = null;
+    this._indicatorEl = null;
     this._stageTimer = null;
     this._indicatorTimer = null;
     this._unsubscribe = null;
+    // Incremented whenever peril becomes inactive; in-flight async renders
+    // check this token before writing DOM so a dismiss can cancel them.
+    this._activationToken = 0;
   }
 
   initialize() {
     this._createStageContainer();
     this._createIndicatorContainer();
 
-    // Subscribe to peril events from the manager
-    this._unsubscribe = PacerManager.onDirePeril(({ active }) => {
+    this._unsubscribe = PacerManager.onDirePeril(({ active, animate }) => {
       if (active) {
-        this._playStageAndShowIndicator();
+        if (animate) {
+          this._playStageAndShowIndicator();
+        } else {
+          this._renderIndicator();
+        }
       } else {
         this._hideIndicator();
       }
@@ -33,8 +39,8 @@ export class PerilOverlay {
   }
 
   /**
-   * Late-join helper — render just the indicator with no animation,
-   * used by module.js when a client joins and peril is already active.
+   * Late-join helper — render just the indicator with no animation.
+   * Safe to call multiple times; no-ops if already rendered.
    */
   showIndicatorOnly() {
     if (this._indicatorEl && this._indicatorEl.childElementCount > 0) return;
@@ -58,11 +64,13 @@ export class PerilOverlay {
   }
 
   async _playStageAndShowIndicator() {
-    await this._renderStage();
-    this._scheduleHandoff();
+    const token = ++this._activationToken;
+    await this._renderStage(token);
+    if (token !== this._activationToken) return;
+    this._scheduleHandoff(token);
   }
 
-  async _renderStage() {
+  async _renderStage(token) {
     if (!this._stageEl) this._createStageContainer();
 
     const context = {
@@ -77,23 +85,23 @@ export class PerilOverlay {
     };
 
     const html = await renderTemplate(STAGE_TEMPLATE, context);
+    if (token !== this._activationToken) return;
     this._stageEl.innerHTML = html;
-    // Force reflow then add the playing class to kick off CSS animations
     void this._stageEl.offsetWidth;
     this._stageEl.classList.add('playing');
   }
 
-  _scheduleHandoff() {
+  _scheduleHandoff(token) {
     clearTimeout(this._indicatorTimer);
     clearTimeout(this._stageTimer);
 
-    // Mount the indicator during the stage's fade-out
     this._indicatorTimer = setTimeout(() => {
+      if (token !== this._activationToken) return;
       this._renderIndicator();
     }, STAGE_DURATION_MS - INDICATOR_LEAD_MS);
 
-    // Remove the stage content after the full duration
     this._stageTimer = setTimeout(() => {
+      if (token !== this._activationToken) return;
       this._unmountStage();
     }, STAGE_DURATION_MS);
   }
@@ -101,7 +109,6 @@ export class PerilOverlay {
   _unmountStage() {
     if (!this._stageEl) return;
     this._stageEl.classList.remove('playing');
-    // Wait a tick before clearing innerHTML so CSS transitions complete
     setTimeout(() => {
       if (this._stageEl) this._stageEl.innerHTML = '';
     }, 300);
@@ -109,6 +116,8 @@ export class PerilOverlay {
 
   async _renderIndicator() {
     if (!this._indicatorEl) this._createIndicatorContainer();
+    const token = this._activationToken || 1;
+    if (!this._activationToken) this._activationToken = token;
 
     const context = {
       isGM: game.user.isGM,
@@ -118,9 +127,9 @@ export class PerilOverlay {
     };
 
     const html = await renderTemplate(INDICATOR_TEMPLATE, context);
+    if (token !== this._activationToken) return;
     this._indicatorEl.innerHTML = html;
 
-    // Wire dismiss button (GM only — template guards render)
     const dismissBtn = this._indicatorEl.querySelector('[data-action="dismiss-peril"]');
     if (dismissBtn) {
       dismissBtn.addEventListener('click', () => {
@@ -128,12 +137,12 @@ export class PerilOverlay {
       });
     }
 
-    // Force reflow then add visible class for enter animation
     void this._indicatorEl.offsetWidth;
     this._indicatorEl.classList.add('visible');
   }
 
   _hideIndicator() {
+    this._activationToken++;
     clearTimeout(this._indicatorTimer);
     clearTimeout(this._stageTimer);
     this._unmountStage();

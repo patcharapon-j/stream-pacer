@@ -54,7 +54,7 @@ class PacerManagerClass {
 
   /**
    * Register a callback for Dire Peril declare/dismiss events.
-   * @param {Function} callback - Called with ({ active: boolean }) on state change
+   * @param {Function} callback - Called with ({ active, animate }) on state change
    * @returns {Function} Unsubscribe function
    */
   onDirePeril(callback) {
@@ -62,10 +62,10 @@ class PacerManagerClass {
     return () => this._direPerilCallbacks.delete(callback);
   }
 
-  _notifyDirePeril(active) {
+  _notifyDirePeril(active, { animate = true } = {}) {
     for (const callback of this._direPerilCallbacks) {
       try {
-        callback({ active });
+        callback({ active, animate });
       } catch (e) {
         console.error(`${MODULE_ID} | Dire Peril callback error:`, e);
       }
@@ -352,6 +352,8 @@ class PacerManagerClass {
       this._countdownInterval = setInterval(() => this._tickCountdown(), 1000);
     }
 
+    // Late-join: surface peril state to the overlay without replaying the animation.
+    this._notifyDirePeril(this._direPerilActive, { animate: false });
     this._notifySubscribers();
   }
 
