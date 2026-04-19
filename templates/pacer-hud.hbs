@@ -1,4 +1,4 @@
-<div id="stream-pacer-container" class="{{#if hasActiveSignal}}signal-active{{/if}} {{#if isCountdown}}countdown-active urgency-{{countdownUrgency}}{{/if}}">
+<div id="stream-pacer-container" class="{{#unless isGM}}is-player{{/unless}} {{#if hasActiveSignal}}signal-active{{/if}} {{#if isCountdown}}countdown-active urgency-{{countdownUrgency}}{{/if}}">
   <div class="sp-accent"></div>
   {{!-- Header --}}
   <div class="pacer-header">
