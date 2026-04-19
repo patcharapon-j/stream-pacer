@@ -76,7 +76,8 @@ export function registerSettings() {
     default: {
       playerStates: {},
       gmSignal: GM_SIGNAL.NONE,
-      countdownEnd: null
+      countdownEnd: null,
+      direPerilActive: false
     }
   });
 

@@ -7,8 +7,10 @@ class PacerManagerClass {
     this._gmSignal = GM_SIGNAL.NONE;
     this._countdownEnd = null;
     this._countdownInterval = null;
+    this._direPerilActive = false;
     this._subscribers = new Set();
     this._handRaiseCallbacks = new Set();
+    this._direPerilCallbacks = new Set();
     this._notifyPending = false;
   }
 
@@ -80,7 +82,8 @@ class PacerManagerClass {
       gmSignal: this._gmSignal,
       countdownEnd: this._countdownEnd,
       countdownRemaining: this.getCountdownRemaining(),
-      handRaisedCount
+      handRaisedCount,
+      direPerilActive: this._direPerilActive
     };
   }
 
@@ -268,6 +271,7 @@ class PacerManagerClass {
     this._playerStates = state.playerStates || {};
     this._gmSignal = state.gmSignal || GM_SIGNAL.NONE;
     this._countdownEnd = state.countdownEnd || null;
+    this._direPerilActive = state.direPerilActive === true;
 
     this._clearCountdownInterval();
     if (this._gmSignal === GM_SIGNAL.COUNTDOWN && this._countdownEnd) {
@@ -307,6 +311,7 @@ class PacerManagerClass {
         this._playerStates = saved.playerStates || {};
         this._gmSignal = saved.gmSignal || GM_SIGNAL.NONE;
         this._countdownEnd = saved.countdownEnd || null;
+        this._direPerilActive = saved.direPerilActive === true;
 
         // Restart countdown interval if needed
         if (this._gmSignal === GM_SIGNAL.COUNTDOWN && this._countdownEnd) {
@@ -335,7 +340,8 @@ class PacerManagerClass {
       game.settings.set(MODULE_ID, 'pacerState', {
         playerStates: this._playerStates,
         gmSignal: this._gmSignal,
-        countdownEnd: this._countdownEnd
+        countdownEnd: this._countdownEnd,
+        direPerilActive: this._direPerilActive
       });
     }, 300);
   }

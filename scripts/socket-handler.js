@@ -149,7 +149,8 @@ class SocketHandlerClass {
       state: {
         playerStates: state.playerStates,
         gmSignal: state.gmSignal,
-        countdownEnd: state.countdownEnd
+        countdownEnd: state.countdownEnd,
+        direPerilActive: state.direPerilActive
       }
     });
   }
