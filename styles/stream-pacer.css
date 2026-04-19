@@ -1,21 +1,46 @@
-/* Stream Pacer - HUD & Overlay Styles */
-/* Arknights-inspired modern design */
+/* Stream Pacer — UI Redesign v1.2
+   Base module: Arknights "Operator Panel" — amber primary, clipped corners, grain overlay.
+   Dire Peril: royal purple + red touch, kinetic-typography full-screen reveal.
+*/
+
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
 
 :root {
-  --sp-engaged: #d4a856;
-  --sp-hand-raised: #4a90d9;
-  --sp-need-time: #9b59b6;
-  --sp-ready: #4a9c6d;
-  --sp-floor-open: #00d4ff;
-  --sp-bg-dark: rgba(20, 24, 28, 0.92);
-  --sp-bg-medium: rgba(30, 35, 42, 0.95);
-  --sp-border: rgba(100, 110, 120, 0.5);
-  --sp-text: #e8e8e8;
-  --sp-text-muted: #8a9199;
-  --sp-warning: #e6a23c;
-  --sp-critical: #f56c6c;
-  --sp-accent-cyan: #00d4ff;
-  --sp-accent-gold: #ffd429;
+  /* Ink — panel background tones */
+  --sp-ink-0: #06080b;
+  --sp-ink-1: #0f131a;
+  --sp-ink-2: #151a22;
+  --sp-ink-3: #1e2530;
+
+  /* Text */
+  --sp-text: #e8ecf0;
+  --sp-muted: #6a7684;
+  --sp-muted-2: #8a96a4;
+
+  /* Lines */
+  --sp-line: rgba(255, 255, 255, 0.06);
+  --sp-line-strong: rgba(255, 255, 255, 0.10);
+
+  /* Primary accent — amber (engaged, soft signal, panel stripe) */
+  --sp-amber: #e4b055;
+  --sp-amber-dim: rgba(228, 176, 85, 0.22);
+  --sp-amber-glow: rgba(228, 176, 85, 0.4);
+
+  /* Status colors */
+  --sp-cyan: #47c8ff;      /* GM badge, floor open */
+  --sp-blue: #5aa3f0;      /* hand raised */
+  --sp-purple: #a684ff;    /* need time */
+  --sp-green: #64c08f;     /* ready */
+  --sp-red: #ef6464;       /* countdown critical */
+  --sp-warn: #f0a850;      /* countdown warning */
+
+  /* Dire Peril — royal purple + red touch */
+  --sp-peril: #a52dc0;
+  --sp-peril-deep: #3d0848;
+  --sp-peril-bright: #f3b8ff;
+  --sp-peril-glow: rgba(175, 45, 185, 0.55);
+  --sp-peril-red: #ff2e5a;
+  --sp-peril-red-glow: rgba(255, 46, 90, 0.45);
 }
 
 /* ========================================
@@ -79,24 +104,6 @@
   overflow: hidden;
 }
 
-/* Subtle scan line effect */
-#stream-pacer-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    transparent,
-    transparent 2px,
-    rgba(0, 0, 0, 0.03) 2px,
-    rgba(0, 0, 0, 0.03) 4px
-  );
-  pointer-events: none;
-  z-index: 1;
-}
 
 #stream-pacer-container.signal-active {
   border-left-color: var(--sp-accent-gold);
