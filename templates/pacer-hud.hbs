@@ -68,13 +68,13 @@
   {{#if hasActiveSignal}}
   <div class="pacer-signal {{#if isSoftSignal}}soft-signal{{else if isFloorOpen}}floor-open-signal{{else}}hard-signal{{/if}}">
     {{#if isSoftSignal}}
-    <i class="fas fa-exclamation-triangle"></i>
+    <i class="fa-solid fa-triangle-exclamation"></i>
     <span>{{localize "STREAM_PACER.SoftSignalMessage"}}</span>
     {{else if isFloorOpen}}
-    <i class="fas fa-microphone"></i>
+    <i class="fa-solid fa-microphone"></i>
     <span>{{localize "STREAM_PACER.FloorOpenMessage"}}</span>
     {{else}}
-    <i class="fas fa-clock"></i>
+    <i class="fa-solid fa-clock"></i>
     <span>{{localize "STREAM_PACER.CountdownMessage"}}</span>
     <span class="countdown-timer">{{formattedCountdown}}</span>
     {{/if}}

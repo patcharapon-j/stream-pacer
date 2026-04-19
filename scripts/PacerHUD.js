@@ -98,14 +98,14 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
   _getStatusIcon(status) {
     switch (status) {
       case PLAYER_STATUS.HAND_RAISED:
-        return 'fa-hand-paper';
+        return 'fa-hand';
       case PLAYER_STATUS.NEED_TIME:
         return 'fa-brain';
       case PLAYER_STATUS.READY:
-        return 'fa-check-circle';
+        return 'fa-circle-check';
       case PLAYER_STATUS.ENGAGED:
       default:
-        return 'fa-hourglass';
+        return 'fa-hourglass-half';
     }
   }
 

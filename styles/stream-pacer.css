@@ -1131,3 +1131,23 @@
   color: rgba(255, 255, 255, 0.75);
   text-transform: uppercase;
 }
+
+/* ========================================
+   Reduced motion — disable animations for users who prefer it
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  #stream-pacer-container,
+  #stream-pacer-container *,
+  .stream-pacer-overlay,
+  .stream-pacer-overlay *,
+  .stream-pacer-hand-bar,
+  .stream-pacer-hand-bar *,
+  .stream-pacer-peril-stage,
+  .stream-pacer-peril-stage *,
+  .stream-pacer-peril-indicator,
+  .stream-pacer-peril-indicator * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
