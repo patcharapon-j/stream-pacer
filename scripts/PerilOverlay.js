@@ -9,6 +9,12 @@ const STAGE_DURATION_MS = 5500;
 /** Offset (ms) before end at which the indicator appears. */
 const INDICATOR_LEAD_MS = 800;
 
+/** v13-safe template renderer — prefer namespaced API, fall back to global shim. */
+function renderHbs(path, ctx) {
+  const ns = foundry?.applications?.handlebars?.renderTemplate;
+  return ns ? ns(path, ctx) : renderTemplate(path, ctx);
+}
+
 export class PerilOverlay {
   constructor() {
     this._stageEl = null;
@@ -84,7 +90,7 @@ export class PerilOverlay {
       columnRight: game.i18n.localize('STREAM_PACER.DirePerilColumnRight')
     };
 
-    const html = await renderTemplate(STAGE_TEMPLATE, context);
+    const html = await renderHbs(STAGE_TEMPLATE, context);
     if (token !== this._activationToken) return;
     this._stageEl.innerHTML = html;
     void this._stageEl.offsetWidth;
@@ -126,7 +132,7 @@ export class PerilOverlay {
       dismissTooltip: game.i18n.localize('STREAM_PACER.DirePerilDismiss')
     };
 
-    const html = await renderTemplate(INDICATOR_TEMPLATE, context);
+    const html = await renderHbs(INDICATOR_TEMPLATE, context);
     if (token !== this._activationToken) return;
     this._indicatorEl.innerHTML = html;
 
