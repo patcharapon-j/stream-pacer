@@ -5,9 +5,9 @@ const STAGE_TEMPLATE = `modules/${MODULE_ID}/templates/peril-stage.hbs`;
 const INDICATOR_TEMPLATE = `modules/${MODULE_ID}/templates/peril-indicator.hbs`;
 
 /** Full animation duration (ms) from declare to indicator handoff. */
-const STAGE_DURATION_MS = 5500;
+const STAGE_DURATION_MS = 4200;
 /** Offset (ms) before end at which the indicator appears. */
-const INDICATOR_LEAD_MS = 800;
+const INDICATOR_LEAD_MS = 700;
 
 /** v13-safe template renderer — prefer namespaced API, fall back to global shim. */
 function renderHbs(path, ctx) {
