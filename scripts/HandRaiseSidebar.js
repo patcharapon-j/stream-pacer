@@ -87,18 +87,40 @@ export class HandRaiseSidebar {
       return;
     }
 
-    // Build via DOM APIs so player names (world-stored strings) can't inject HTML.
+    // Edge rules for decorative horizontal lines
+    const edgeT = document.createElement('span');
+    edgeT.className = 'hb-edge hb-edge-t';
+    const edgeB = document.createElement('span');
+    edgeB.className = 'hb-edge hb-edge-b';
+
+    // Content row
+    const row = document.createElement('span');
+    row.className = 'hb-row';
+
+    // PRIORITY / 01 index chip
+    const ix = document.createElement('span');
+    ix.className = 'hb-ix';
+    ix.textContent = game.i18n.format('STREAM_PACER.PriorityIndex', { n: '01' });
+
+    // Hand icon
     const icon = document.createElement('span');
-    icon.className = 'hand-icon';
+    icon.className = 'hb-icon';
     const iconI = document.createElement('i');
-    iconI.className = 'fas fa-hand-paper';
+    iconI.className = 'fa-solid fa-hand';
     icon.appendChild(iconI);
 
+    // Names (textContent only — player names are untrusted strings)
     const names = document.createElement('span');
-    names.className = 'player-names';
+    names.className = 'hb-names';
     names.textContent = this._currentPlayers.map(p => p.name).join(', ');
 
-    this._contentEl.replaceChildren(icon, names);
+    // Trailing tag
+    const tag = document.createElement('span');
+    tag.className = 'hb-tag';
+    tag.textContent = game.i18n.localize('STREAM_PACER.HandRaisedTag');
+
+    row.append(ix, icon, names, tag);
+    this._contentEl.replaceChildren(edgeT, edgeB, row);
   }
 
   /**
