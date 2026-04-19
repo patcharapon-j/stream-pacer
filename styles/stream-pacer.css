@@ -416,112 +416,14 @@
 }
 
 /* ========================================
-   Player Status Buttons - Icons Only
+   Status buttons (player) + GM buttons
+   Shared styling — only active-state colors differ.
    ======================================== */
 
-#stream-pacer-container .pacer-my-status {
-  /* layout/border handled by .p-sec */
-}
-
-#stream-pacer-container .status-label {
-  display: none;
-}
-
 #stream-pacer-container .status-buttons {
-  display: flex;
-  gap: 3px;
-  flex: 1;
-}
-
-#stream-pacer-container .status-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 5px 10px;
-  border: 1px solid var(--sp-border);
-  border-radius: 1px;
-  background: rgba(255, 255, 255, 0.02);
-  color: var(--sp-text-muted);
-  font-size: 10px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  flex: 1;
-}
-
-#stream-pacer-container .status-btn span {
-  display: none;
-}
-
-#stream-pacer-container .status-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--sp-text);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-#stream-pacer-container .status-btn.status-hand-raised:hover:not(.active) {
-  background: rgba(74, 144, 217, 0.1);
-  border-color: rgba(74, 144, 217, 0.5);
-  color: var(--sp-hand-raised);
-  box-shadow: 0 0 10px rgba(74, 144, 217, 0.3);
-}
-
-#stream-pacer-container .status-btn.status-engaged.active {
-  background: rgba(212, 168, 86, 0.15);
-  border-color: var(--sp-engaged);
-  color: var(--sp-engaged);
-  box-shadow: 0 0 8px rgba(212, 168, 86, 0.3);
-}
-
-#stream-pacer-container .status-btn.status-hand-raised.active {
-  background: linear-gradient(
-    135deg,
-    rgba(74, 144, 217, 0.2) 0%,
-    rgba(100, 180, 255, 0.15) 50%,
-    rgba(74, 144, 217, 0.2) 100%
-  );
-  border-color: var(--sp-hand-raised);
-  color: var(--sp-hand-raised);
-  box-shadow:
-    0 0 15px rgba(74, 144, 217, 0.5),
-    0 0 30px rgba(74, 144, 217, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  animation: pulse-hand-raised-btn 1.5s ease-in-out infinite;
-  position: relative;
-  overflow: hidden;
-}
-
-#stream-pacer-container .status-btn.status-hand-raised.active::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.3) 50%,
-    transparent 100%
-  );
-  animation: hand-raised-shimmer 2s ease-in-out infinite;
-}
-
-#stream-pacer-container .status-btn.status-hand-raised.active i {
-  filter: drop-shadow(0 0 4px rgba(74, 144, 217, 0.8));
-}
-
-#stream-pacer-container .status-btn.status-ready.active {
-  background: rgba(74, 156, 109, 0.15);
-  border-color: var(--sp-ready);
-  color: var(--sp-ready);
-  box-shadow: 0 0 8px rgba(74, 156, 109, 0.3);
-}
-
-#stream-pacer-container .status-btn.status-need-time.active {
-  background: rgba(155, 89, 182, 0.15);
-  border-color: var(--sp-need-time);
-  color: var(--sp-need-time);
-  box-shadow: 0 0 8px rgba(155, 89, 182, 0.3);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
 }
 
 /* ========================================
@@ -572,75 +474,177 @@
   animation: flash-critical 0.5s ease-in-out infinite;
 }
 
-/* ========================================
-   GM Controls - Icons Only
-   ======================================== */
-
 #stream-pacer-container .pacer-gm-controls {
-  display: flex;
-  gap: 3px;
-  flex-wrap: nowrap;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
 }
 
+#stream-pacer-container .status-btn,
 #stream-pacer-container .gm-btn {
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 5px 10px;
-  border: 1px solid var(--sp-border);
-  border-radius: 1px;
-  background: rgba(255, 255, 255, 0.02);
-  color: var(--sp-text);
-  font-size: 10px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+  border: 1px solid var(--sp-line-strong);
+  color: var(--sp-muted-2);
+  font-size: 12px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.12s ease;
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+  position: relative;
 }
 
+#stream-pacer-container .status-btn span,
 #stream-pacer-container .gm-btn span {
   display: none;
 }
 
+#stream-pacer-container .status-btn::before,
+#stream-pacer-container .gm-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12) 50%, transparent);
+  pointer-events: none;
+}
+
+#stream-pacer-container .status-btn:hover,
 #stream-pacer-container .gm-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--sp-text);
+  border-color: rgba(255, 255, 255, 0.22);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+  transform: translateY(-1px);
 }
 
-#stream-pacer-container .gm-btn i {
-  font-size: 10px;
+#stream-pacer-container .status-btn:active,
+#stream-pacer-container .gm-btn:active {
+  transform: translateY(0);
+  filter: brightness(0.9);
 }
 
-#stream-pacer-container .soft-signal-btn:hover,
-#stream-pacer-container .soft-signal-btn.active {
-  border-color: var(--sp-accent-gold);
-  color: var(--sp-accent-gold);
-  background: rgba(255, 212, 41, 0.1);
+/* Hand-raised button — color-specific hover */
+#stream-pacer-container .status-btn.status-hand-raised:hover:not(.active) {
+  color: var(--sp-blue);
+  border-color: rgba(90, 163, 240, 0.5);
+  background: rgba(90, 163, 240, 0.1);
+  box-shadow: 0 0 10px rgba(90, 163, 240, 0.3);
 }
 
-#stream-pacer-container .countdown-btn:hover,
-#stream-pacer-container .countdown-btn.active {
-  border-color: var(--sp-critical);
-  color: var(--sp-critical);
-  background: rgba(245, 108, 108, 0.1);
+/* Active states — status buttons */
+#stream-pacer-container .status-btn.status-engaged.active {
+  color: var(--sp-amber);
+  border-color: var(--sp-amber);
+  background: linear-gradient(180deg, rgba(228, 176, 85, 0.18), rgba(228, 176, 85, 0.06));
+  box-shadow: 0 0 10px rgba(228, 176, 85, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
-#stream-pacer-container .floor-open-btn:hover,
-#stream-pacer-container .floor-open-btn.active {
-  border-color: var(--sp-floor-open);
-  color: var(--sp-floor-open);
-  background: rgba(0, 212, 255, 0.1);
+#stream-pacer-container .status-btn.status-hand-raised.active {
+  color: var(--sp-blue);
+  border-color: var(--sp-blue);
+  background: linear-gradient(135deg, rgba(90, 163, 240, 0.2), rgba(90, 163, 240, 0.08));
+  box-shadow:
+    0 0 15px rgba(90, 163, 240, 0.5),
+    0 0 30px rgba(90, 163, 240, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  animation: sp-hand-btn-pulse 1.6s ease-in-out infinite;
+  overflow: hidden;
 }
 
-#stream-pacer-container .cancel-btn {
-  border-color: var(--sp-text-muted);
+#stream-pacer-container .status-btn.status-hand-raised.active::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+  animation: sp-shimmer-sweep 2s ease-in-out infinite;
 }
 
-#stream-pacer-container .cancel-btn:hover {
-  border-color: var(--sp-critical);
-  color: var(--sp-critical);
+#stream-pacer-container .status-btn.status-hand-raised.active i {
+  filter: drop-shadow(0 0 4px rgba(90, 163, 240, 0.8));
 }
 
-#stream-pacer-container .reset-btn {
-  margin-left: auto;
+#stream-pacer-container .status-btn.status-ready.active {
+  color: var(--sp-green);
+  border-color: var(--sp-green);
+  background: linear-gradient(180deg, rgba(100, 192, 143, 0.18), rgba(100, 192, 143, 0.06));
+  box-shadow: 0 0 10px rgba(100, 192, 143, 0.35);
+}
+
+#stream-pacer-container .status-btn.status-need-time.active {
+  color: var(--sp-purple);
+  border-color: var(--sp-purple);
+  background: linear-gradient(180deg, rgba(166, 132, 255, 0.18), rgba(166, 132, 255, 0.06));
+  box-shadow: 0 0 10px rgba(166, 132, 255, 0.35);
+}
+
+/* Active states — GM buttons */
+#stream-pacer-container .gm-btn.soft-signal-btn:hover,
+#stream-pacer-container .gm-btn.soft-signal-btn.active {
+  color: var(--sp-amber);
+  border-color: var(--sp-amber);
+  background: linear-gradient(180deg, rgba(228, 176, 85, 0.18), rgba(228, 176, 85, 0.06));
+  box-shadow: 0 0 12px rgba(228, 176, 85, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+#stream-pacer-container .gm-btn.soft-signal-btn.active {
+  animation: sp-btn-pulse-amber 2.4s ease-in-out infinite;
+}
+
+#stream-pacer-container .gm-btn.countdown-btn:hover,
+#stream-pacer-container .gm-btn.countdown-btn.active {
+  color: var(--sp-red);
+  border-color: var(--sp-red);
+  background: linear-gradient(180deg, rgba(239, 100, 100, 0.18), rgba(239, 100, 100, 0.06));
+  box-shadow: 0 0 12px rgba(239, 100, 100, 0.35);
+}
+
+#stream-pacer-container .gm-btn.floor-open-btn:hover,
+#stream-pacer-container .gm-btn.floor-open-btn.active {
+  color: var(--sp-cyan);
+  border-color: var(--sp-cyan);
+  background: linear-gradient(180deg, rgba(71, 200, 255, 0.18), rgba(71, 200, 255, 0.06));
+  box-shadow: 0 0 12px rgba(71, 200, 255, 0.35);
+}
+
+#stream-pacer-container .gm-btn.cancel-btn:hover {
+  color: var(--sp-red);
+  border-color: var(--sp-red);
+}
+
+#stream-pacer-container .gm-btn.reset-btn {
+  /* reset uses neutral hover */
+}
+
+@keyframes sp-hand-btn-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 15px rgba(90, 163, 240, 0.5),
+      0 0 30px rgba(90, 163, 240, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(90, 163, 240, 0.7),
+      0 0 40px rgba(90, 163, 240, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+}
+
+@keyframes sp-btn-pulse-amber {
+  0%, 100% { box-shadow: 0 0 12px rgba(228, 176, 85, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1); }
+  50% { box-shadow: 0 0 18px rgba(228, 176, 85, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15); }
 }
 
 /* ========================================
@@ -838,30 +842,6 @@
 /* ========================================
    Animations
    ======================================== */
-
-@keyframes pulse-hand-raised-btn {
-  0%, 100% {
-    box-shadow:
-      0 0 15px rgba(74, 144, 217, 0.5),
-      0 0 30px rgba(74, 144, 217, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  }
-  50% {
-    box-shadow:
-      0 0 20px rgba(74, 144, 217, 0.7),
-      0 0 40px rgba(74, 144, 217, 0.35),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  }
-}
-
-@keyframes hand-raised-shimmer {
-  0% {
-    left: -100%;
-  }
-  50%, 100% {
-    left: 200%;
-  }
-}
 
 @keyframes pulse-warning {
   0%, 100% { box-shadow: 0 0 15px rgba(230, 162, 60, 0.2), 0 2px 12px rgba(0, 0, 0, 0.4); }
