@@ -87,47 +87,96 @@
 }
 
 #stream-pacer-container {
-  background: var(--sp-bg-dark);
-  border: 1px solid var(--sp-border);
-  border-left: 2px solid var(--sp-accent-cyan);
-  border-radius: 2px;
-  font-family: 'Signika', sans-serif;
-  font-size: 11px;
-  color: var(--sp-text);
-  min-width: auto;
-  max-width: 200px;
-  box-shadow:
-    0 2px 12px rgba(0, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
-  transition: box-shadow 0.3s ease, border-color 0.3s ease;
   position: relative;
-  overflow: hidden;
-}
-
-
-#stream-pacer-container.signal-active {
-  border-left-color: var(--sp-accent-gold);
+  width: 300px;
+  background: linear-gradient(180deg, var(--sp-ink-2) 0%, var(--sp-ink-1) 100%);
+  color: var(--sp-text);
+  font-family: 'Rajdhani', 'Signika', sans-serif;
+  font-size: 11px;
+  clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+  backdrop-filter: blur(6px);
   box-shadow:
-    0 0 15px rgba(255, 212, 41, 0.15),
-    0 2px 12px rgba(0, 0, 0, 0.4);
+    0 14px 40px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    inset 0 -20px 30px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(228, 176, 85, 0.1);
+  transition: box-shadow 0.3s ease;
+  animation: sp-panel-drift 14s ease-in-out infinite alternate;
 }
 
-#stream-pacer-container.countdown-active {
-  border-left-color: var(--sp-critical);
+/* Grain overlay — two layered repeating gradients */
+#stream-pacer-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 2px, rgba(255, 255, 255, 0.012) 2px 3px),
+    repeating-linear-gradient(45deg, transparent 0 22px, rgba(255, 255, 255, 0.018) 22px 23px);
+  pointer-events: none;
+  z-index: 1;
 }
 
-#stream-pacer-container.countdown-active.urgency-warning {
-  box-shadow:
-    0 0 20px rgba(230, 162, 60, 0.2),
-    0 2px 12px rgba(0, 0, 0, 0.4);
-  animation: pulse-warning 2s ease-in-out infinite;
+/* Top inner-highlight hairline */
+#stream-pacer-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 14px;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12) 30%, rgba(255, 255, 255, 0.12) 70%, transparent);
+  pointer-events: none;
+  z-index: 3;
 }
 
-#stream-pacer-container.countdown-active.urgency-critical {
-  box-shadow:
-    0 0 25px rgba(245, 108, 108, 0.25),
-    0 2px 12px rgba(0, 0, 0, 0.4);
-  animation: pulse-critical 1s ease-in-out infinite;
+/* Left accent stripe — inserted in template */
+#stream-pacer-container .sp-accent {
+  position: absolute;
+  top: 0;
+  bottom: 14px;
+  left: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--sp-amber) 0%, rgba(228, 176, 85, 0.1) 100%);
+  box-shadow: 0 0 8px var(--sp-amber-glow);
+  z-index: 2;
+}
+
+#stream-pacer-container .sp-accent::after {
+  content: '';
+  position: absolute;
+  top: 56px;
+  left: 2px;
+  width: 10px;
+  height: 1px;
+  background: var(--sp-amber);
+  box-shadow: 0 0 6px var(--sp-amber);
+}
+
+/* Signal-active and countdown urgency override the accent stripe color */
+#stream-pacer-container.signal-active .sp-accent {
+  background: linear-gradient(180deg, var(--sp-amber) 0%, var(--sp-amber) 50%, rgba(228, 176, 85, 0.3) 100%);
+}
+
+#stream-pacer-container.countdown-active .sp-accent {
+  background: linear-gradient(180deg, var(--sp-red) 0%, rgba(239, 100, 100, 0.3) 100%);
+  box-shadow: 0 0 10px rgba(239, 100, 100, 0.45);
+}
+
+@keyframes sp-panel-drift {
+  0% {
+    box-shadow:
+      0 14px 40px rgba(0, 0, 0, 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.03),
+      inset 0 -20px 30px rgba(0, 0, 0, 0.4),
+      0 0 0 1px rgba(228, 176, 85, 0.08);
+  }
+  100% {
+    box-shadow:
+      0 14px 50px rgba(0, 0, 0, 0.6),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      inset 0 -20px 34px rgba(0, 0, 0, 0.45),
+      0 0 0 1px rgba(228, 176, 85, 0.16);
+  }
 }
 
 /* ========================================
