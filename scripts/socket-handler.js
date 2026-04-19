@@ -11,7 +11,9 @@ const EVENTS = {
   GM_CANCEL_SIGNAL: 'gmCancelSignal',
   REQUEST_STATE: 'requestState',
   SYNC_STATE: 'syncState',
-  RESET_ALL: 'resetAll'
+  RESET_ALL: 'resetAll',
+  DIRE_PERIL_DECLARE: 'direPerilDeclare',
+  DIRE_PERIL_DISMISS: 'direPerilDismiss'
 };
 
 class SocketHandlerClass {
@@ -105,6 +107,16 @@ class SocketHandlerClass {
         if (!senderIsGM) break;
         PacerManager.receiveResetAll();
         break;
+
+      case EVENTS.DIRE_PERIL_DECLARE:
+        if (!senderIsGM) break;
+        PacerManager.receiveDirePerilDeclare();
+        break;
+
+      case EVENTS.DIRE_PERIL_DISMISS:
+        if (!senderIsGM) break;
+        PacerManager.receiveDirePerilDismiss();
+        break;
     }
   }
 
@@ -157,6 +169,14 @@ class SocketHandlerClass {
 
   emitResetAll() {
     this._emit(EVENTS.RESET_ALL);
+  }
+
+  emitDirePerilDeclare() {
+    this._emit(EVENTS.DIRE_PERIL_DECLARE);
+  }
+
+  emitDirePerilDismiss() {
+    this._emit(EVENTS.DIRE_PERIL_DISMISS);
   }
 }
 
