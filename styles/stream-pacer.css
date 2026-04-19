@@ -1132,6 +1132,28 @@
   text-transform: uppercase;
 }
 
+/* Dire Peril button */
+#stream-pacer-container .gm-btn.dire-peril-btn {
+  border-color: rgba(175, 45, 185, 0.55);
+  color: var(--sp-peril-bright);
+}
+
+#stream-pacer-container .gm-btn.dire-peril-btn:hover:not(.disabled):not([disabled]) {
+  color: #fff;
+  border-color: var(--sp-peril);
+  background: linear-gradient(180deg, rgba(175, 45, 185, 0.22), rgba(175, 45, 185, 0.08));
+  box-shadow:
+    0 0 12px var(--sp-peril-glow),
+    inset 0 0 8px var(--sp-peril-red-glow);
+}
+
+#stream-pacer-container .gm-btn.dire-peril-btn.disabled,
+#stream-pacer-container .gm-btn.dire-peril-btn[disabled] {
+  opacity: 0.35;
+  pointer-events: none;
+  cursor: default;
+}
+
 /* ========================================
    Reduced motion — disable animations for users who prefer it
    ======================================== */

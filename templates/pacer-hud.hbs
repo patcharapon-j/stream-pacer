@@ -105,6 +105,12 @@
               title="{{localize 'STREAM_PACER.FloorOpenTooltip'}}">
         <i class="fa-solid fa-microphone"></i>
       </button>
+      <button type="button" class="gm-btn dire-peril-btn {{#if direPerilActive}}disabled{{/if}}"
+              data-action="declare-peril"
+              {{#if direPerilActive}}disabled{{/if}}
+              title="{{localize 'STREAM_PACER.DirePerilTooltip'}}">
+        <i class="fa-solid fa-skull"></i>
+      </button>
       {{#if hasActiveSignal}}
       <button type="button" class="gm-btn cancel-btn"
               data-action="cancel-signal"

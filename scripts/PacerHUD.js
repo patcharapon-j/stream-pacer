@@ -90,6 +90,7 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
       formattedCountdown,
       countdownUrgency,
       handRaisedCount: state.handRaisedCount,
+      direPerilActive: state.direPerilActive,
       PLAYER_STATUS,
       GM_SIGNAL
     };
@@ -187,6 +188,9 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
           break;
         case 'reset-all':
           if (game.user.isGM) PacerManager.resetAll();
+          break;
+        case 'declare-peril':
+          if (game.user.isGM) PacerManager.declareDirePeril();
           break;
       }
     };
