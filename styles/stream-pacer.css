@@ -287,7 +287,7 @@
 }
 
 /* ========================================
-   Player Status Bar - Icon + Name Chips
+   Player chips
    ======================================== */
 
 #stream-pacer-container .pacer-players {
@@ -299,96 +299,120 @@
 #stream-pacer-container .player-status {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 3px 6px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.03);
-  font-size: 9px;
-  transition: all 0.2s ease;
-  border-left: 2px solid transparent;
-}
-
-#stream-pacer-container .player-status i {
-  font-size: 9px;
-}
-
-#stream-pacer-container .player-status.status-engaged {
-  border-left-color: var(--sp-engaged);
-}
-
-#stream-pacer-container .player-status.status-engaged i {
-  color: var(--sp-engaged);
-}
-
-#stream-pacer-container .player-status.status-hand-raised {
-  border-left-color: var(--sp-hand-raised);
-  background: linear-gradient(
-    135deg,
-    rgba(74, 144, 217, 0.25) 0%,
-    rgba(100, 180, 255, 0.2) 50%,
-    rgba(74, 144, 217, 0.25) 100%
-  );
-  box-shadow:
-    0 0 12px rgba(74, 144, 217, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  animation: pulse-hand-raised 1.5s ease-in-out infinite;
+  gap: 6px;
+  padding: 3px 8px 3px 7px;
+  background: rgba(255, 255, 255, 0.025);
+  border-left: 2px solid var(--sp-muted);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  color: var(--sp-text);
+  transition: all 0.25s cubic-bezier(0.2, 0.7, 0.3, 1);
   position: relative;
   overflow: hidden;
 }
 
-#stream-pacer-container .player-status.status-hand-raised::before {
+#stream-pacer-container .player-status i {
+  font-size: 9px;
+  width: 11px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+#stream-pacer-container .player-name {
+  max-width: 70px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Engaged — amber */
+#stream-pacer-container .player-status.status-engaged {
+  border-left-color: var(--sp-amber);
+  background: rgba(228, 176, 85, 0.05);
+}
+#stream-pacer-container .player-status.status-engaged i {
+  color: var(--sp-amber);
+}
+
+/* Ready — green */
+#stream-pacer-container .player-status.status-ready {
+  border-left-color: var(--sp-green);
+  background: rgba(100, 192, 143, 0.08);
+}
+#stream-pacer-container .player-status.status-ready i {
+  color: var(--sp-green);
+}
+
+/* Need Time — purple (soft lavender) */
+#stream-pacer-container .player-status.status-need-time {
+  border-left-color: var(--sp-purple);
+  background: rgba(166, 132, 255, 0.08);
+}
+#stream-pacer-container .player-status.status-need-time i {
+  color: var(--sp-purple);
+}
+
+/* Hand Raised — blue with glow + shimmer sweep */
+#stream-pacer-container .player-status.status-hand-raised {
+  border-left-color: var(--sp-blue);
+  background: linear-gradient(135deg, rgba(90, 163, 240, 0.25) 0%, rgba(90, 163, 240, 0.08) 100%);
+  box-shadow:
+    0 0 14px rgba(90, 163, 240, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  animation: sp-hand-pulse 1.6s ease-in-out infinite;
+}
+
+#stream-pacer-container .player-status.status-hand-raised i {
+  color: var(--sp-blue);
+  filter: drop-shadow(0 0 4px rgba(90, 163, 240, 0.9));
+  animation: sp-hand-icon-pulse 1.6s ease-in-out infinite;
+}
+
+#stream-pacer-container .player-status.status-hand-raised::after {
   content: '';
   position: absolute;
   top: 0;
   left: -100%;
-  width: 100%;
+  width: 70%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.4) 50%,
-    transparent 100%
-  );
-  animation: hand-raised-shimmer 2s ease-in-out infinite;
-}
-
-#stream-pacer-container .player-status.status-hand-raised i {
-  color: var(--sp-hand-raised);
-  filter: drop-shadow(0 0 3px rgba(74, 144, 217, 0.6));
-  animation: hand-icon-glow 1.5s ease-in-out infinite;
-}
-
-#stream-pacer-container .player-status.status-ready {
-  border-left-color: var(--sp-ready);
-  background: rgba(74, 156, 109, 0.1);
-}
-
-#stream-pacer-container .player-status.status-ready i {
-  color: var(--sp-ready);
-}
-
-#stream-pacer-container .player-status.status-need-time {
-  border-left-color: var(--sp-need-time);
-  background: rgba(155, 89, 182, 0.1);
-}
-
-#stream-pacer-container .player-status.status-need-time i {
-  color: var(--sp-need-time);
-}
-
-#stream-pacer-container .player-name {
-  max-width: 50px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  color: var(--sp-text);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  animation: sp-shimmer-sweep 2.6s ease-in-out infinite;
 }
 
 #stream-pacer-container .no-players {
-  color: var(--sp-text-muted);
+  color: var(--sp-muted-2);
   font-style: italic;
-  font-size: 9px;
+  font-size: 10px;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+@keyframes sp-hand-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 14px rgba(90, 163, 240, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 22px rgba(90, 163, 240, 0.65),
+      0 0 40px rgba(90, 163, 240, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.25),
+      inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+  }
+}
+
+@keyframes sp-hand-icon-pulse {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(90, 163, 240, 0.9)); }
+  50% { filter: drop-shadow(0 0 8px rgba(90, 163, 240, 1)); }
+}
+
+@keyframes sp-shimmer-sweep {
+  0% { left: -100%; }
+  60%, 100% { left: 200%; }
 }
 
 /* ========================================
@@ -815,22 +839,6 @@
    Animations
    ======================================== */
 
-@keyframes pulse-hand-raised {
-  0%, 100% {
-    box-shadow:
-      0 0 12px rgba(74, 144, 217, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.25),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  }
-  50% {
-    box-shadow:
-      0 0 20px rgba(74, 144, 217, 0.6),
-      0 0 35px rgba(74, 144, 217, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.35),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  }
-}
-
 @keyframes pulse-hand-raised-btn {
   0%, 100% {
     box-shadow:
@@ -852,15 +860,6 @@
   }
   50%, 100% {
     left: 200%;
-  }
-}
-
-@keyframes hand-icon-glow {
-  0%, 100% {
-    filter: drop-shadow(0 0 3px rgba(74, 144, 217, 0.6));
-  }
-  50% {
-    filter: drop-shadow(0 0 6px rgba(74, 144, 217, 0.9));
   }
 }
 
