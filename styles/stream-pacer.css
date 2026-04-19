@@ -427,51 +427,124 @@
 }
 
 /* ========================================
-   GM Signal Display - Compact
+   Active signal band
+   Appears when a signal is active; sits between operators and command
    ======================================== */
 
 #stream-pacer-container .pacer-signal {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 6px 8px;
+  gap: 10px;
+  padding: 9px 14px 9px 18px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 10.5px;
   font-weight: 600;
-  font-size: 10px;
-  text-align: center;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border-top: 1px solid var(--sp-amber-dim);
+  border-bottom: 1px solid var(--sp-amber-dim);
+  background: linear-gradient(90deg, rgba(228, 176, 85, 0.18), rgba(228, 176, 85, 0.04));
+  color: var(--sp-amber);
   position: relative;
   z-index: 2;
+  overflow: hidden;
+  animation: sp-signal-glow 3s ease-in-out infinite;
+}
+
+#stream-pacer-container .pacer-signal i {
+  filter: drop-shadow(0 0 6px rgba(228, 176, 85, 0.6));
+  font-size: 12px;
 }
 
 #stream-pacer-container .pacer-signal.soft-signal {
-  background: rgba(255, 212, 41, 0.1);
-  color: var(--sp-accent-gold);
-}
-
-#stream-pacer-container .pacer-signal.hard-signal {
-  background: rgba(245, 108, 108, 0.1);
-  color: var(--sp-critical);
+  /* already amber by default — no override needed */
 }
 
 #stream-pacer-container .pacer-signal.floor-open-signal {
-  background: rgba(0, 212, 255, 0.1);
-  color: var(--sp-floor-open);
+  border-top-color: rgba(71, 200, 255, 0.25);
+  border-bottom-color: rgba(71, 200, 255, 0.25);
+  background: linear-gradient(90deg, rgba(71, 200, 255, 0.18), rgba(71, 200, 255, 0.04));
+  color: var(--sp-cyan);
+}
+
+#stream-pacer-container .pacer-signal.floor-open-signal i {
+  filter: drop-shadow(0 0 6px rgba(71, 200, 255, 0.6));
+}
+
+#stream-pacer-container .pacer-signal.hard-signal {
+  border-top-color: rgba(239, 100, 100, 0.3);
+  border-bottom-color: rgba(239, 100, 100, 0.3);
+  background: linear-gradient(90deg, rgba(239, 100, 100, 0.2), rgba(239, 100, 100, 0.05));
+  color: var(--sp-red);
+}
+
+#stream-pacer-container .pacer-signal.hard-signal i {
+  filter: drop-shadow(0 0 6px rgba(239, 100, 100, 0.6));
+}
+
+#stream-pacer-container .pacer-signal::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+  animation: sp-shimmer-sweep 4s ease-in-out infinite;
 }
 
 #stream-pacer-container .countdown-timer {
+  margin-left: auto;
+  font-family: 'JetBrains Mono', monospace;
   font-size: 14px;
   font-weight: 700;
-  font-family: 'Courier New', monospace;
-  margin-left: 2px;
+  letter-spacing: 1px;
+  color: var(--sp-text);
+  text-shadow: 0 0 8px rgba(228, 176, 85, 0.4);
 }
 
-.urgency-warning .countdown-timer {
-  color: var(--sp-warning);
+/* Urgency escalation */
+#stream-pacer-container.countdown-active.urgency-warning {
+  animation: sp-pulse-warning 2s ease-in-out infinite;
+}
+#stream-pacer-container.countdown-active.urgency-warning .pacer-signal {
+  color: var(--sp-warn);
+}
+#stream-pacer-container.countdown-active.urgency-warning .countdown-timer {
+  color: var(--sp-warn);
+  text-shadow: 0 0 8px rgba(240, 168, 80, 0.5);
 }
 
-.urgency-critical .countdown-timer {
-  color: var(--sp-critical);
-  animation: flash-critical 0.5s ease-in-out infinite;
+#stream-pacer-container.countdown-active.urgency-critical {
+  animation: sp-pulse-critical 1s ease-in-out infinite;
+}
+#stream-pacer-container.countdown-active.urgency-critical .pacer-signal {
+  color: var(--sp-red);
+}
+#stream-pacer-container.countdown-active.urgency-critical .countdown-timer {
+  color: var(--sp-red);
+  text-shadow: 0 0 8px rgba(239, 100, 100, 0.6);
+  animation: sp-flash-critical 0.5s ease-in-out infinite;
+}
+
+@keyframes sp-signal-glow {
+  0%, 100% { box-shadow: inset 0 0 20px rgba(228, 176, 85, 0.1); }
+  50% { box-shadow: inset 0 0 30px rgba(228, 176, 85, 0.2); }
+}
+
+@keyframes sp-pulse-warning {
+  0%, 100% { box-shadow: 0 0 15px rgba(240, 168, 80, 0.2), 0 14px 40px rgba(0, 0, 0, 0.55); }
+  50% { box-shadow: 0 0 25px rgba(240, 168, 80, 0.35), 0 14px 40px rgba(0, 0, 0, 0.55); }
+}
+
+@keyframes sp-pulse-critical {
+  0%, 100% { box-shadow: 0 0 18px rgba(239, 100, 100, 0.2), 0 14px 40px rgba(0, 0, 0, 0.55); }
+  50% { box-shadow: 0 0 30px rgba(239, 100, 100, 0.4), 0 14px 40px rgba(0, 0, 0, 0.55); }
+}
+
+@keyframes sp-flash-critical {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
 }
 
 #stream-pacer-container .pacer-gm-controls {
@@ -842,16 +915,6 @@
 /* ========================================
    Animations
    ======================================== */
-
-@keyframes pulse-warning {
-  0%, 100% { box-shadow: 0 0 15px rgba(230, 162, 60, 0.2), 0 2px 12px rgba(0, 0, 0, 0.4); }
-  50% { box-shadow: 0 0 25px rgba(230, 162, 60, 0.35), 0 2px 12px rgba(0, 0, 0, 0.4); }
-}
-
-@keyframes pulse-critical {
-  0%, 100% { box-shadow: 0 0 18px rgba(245, 108, 108, 0.2), 0 2px 12px rgba(0, 0, 0, 0.4); }
-  50% { box-shadow: 0 0 30px rgba(245, 108, 108, 0.4), 0 2px 12px rgba(0, 0, 0, 0.4); }
-}
 
 @keyframes ticker-glow {
   0%, 100% {
