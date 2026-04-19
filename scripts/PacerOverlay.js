@@ -12,6 +12,7 @@ export class PacerOverlay {
     this._messageEls = null;
     this._countdownEls = null;
     this._iconEls = null;
+    this._ixEls = null;
   }
 
   initialize() {
@@ -81,6 +82,7 @@ export class PacerOverlay {
     this._messageEls = this._element.querySelectorAll('.overlay-message');
     this._countdownEls = this._element.querySelectorAll('.overlay-countdown');
     this._iconEls = this._element.querySelectorAll('.overlay-icon i');
+    this._ixEls = this._element.querySelectorAll('.overlay-ix');
 
     // Re-apply current state
     this._update(PacerManager.getState());
@@ -89,7 +91,8 @@ export class PacerOverlay {
   _createTickerSegment() {
     return `
       <span class="ticker-segment">
-        <span class="overlay-icon"><i class="fas fa-exclamation-triangle"></i></span>
+        <span class="overlay-ix"></span>
+        <span class="overlay-icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
         <span class="overlay-message"></span>
         <span class="overlay-countdown"></span>
       </span>
@@ -100,41 +103,40 @@ export class PacerOverlay {
   _update(state) {
     if (!this._element) return;
 
-    // Use cached NodeLists; they're refreshed only when segments rebuild.
     const messageEls = this._messageEls ?? this._element.querySelectorAll('.overlay-message');
     const countdownEls = this._countdownEls ?? this._element.querySelectorAll('.overlay-countdown');
     const iconEls = this._iconEls ?? this._element.querySelectorAll('.overlay-icon i');
+    const ixEls = this._ixEls ?? this._element.querySelectorAll('.overlay-ix');
 
     if (state.gmSignal === GM_SIGNAL.SOFT) {
       this._element.classList.add('active', 'soft-signal');
       this._element.classList.remove('countdown-signal', 'floor-open-signal', 'urgency-warning', 'urgency-critical');
 
-      const message = game.i18n.localize('STREAM_PACER.SoftSignalMessage');
-      iconEls.forEach(el => el.className = 'fas fa-exclamation-triangle');
-      messageEls.forEach(el => el.textContent = message);
+      iconEls.forEach(el => el.className = 'fa-solid fa-triangle-exclamation');
+      messageEls.forEach(el => el.textContent = game.i18n.localize('STREAM_PACER.SoftSignalMessage'));
       countdownEls.forEach(el => el.textContent = '');
+      ixEls.forEach(el => el.textContent = game.i18n.format('STREAM_PACER.TickerIndex', { n: '01' }));
     } else if (state.gmSignal === GM_SIGNAL.FLOOR_OPEN) {
       this._element.classList.add('active', 'floor-open-signal');
       this._element.classList.remove('soft-signal', 'countdown-signal', 'urgency-warning', 'urgency-critical');
 
-      const message = game.i18n.localize('STREAM_PACER.FloorOpenMessage');
-      iconEls.forEach(el => el.className = 'fas fa-microphone');
-      messageEls.forEach(el => el.textContent = message);
+      iconEls.forEach(el => el.className = 'fa-solid fa-microphone');
+      messageEls.forEach(el => el.textContent = game.i18n.localize('STREAM_PACER.FloorOpenMessage'));
       countdownEls.forEach(el => el.textContent = '');
+      ixEls.forEach(el => el.textContent = game.i18n.format('STREAM_PACER.TickerIndex', { n: '02' }));
     } else if (state.gmSignal === GM_SIGNAL.COUNTDOWN) {
       this._element.classList.add('active', 'countdown-signal');
       this._element.classList.remove('soft-signal', 'floor-open-signal');
 
-      const message = game.i18n.localize('STREAM_PACER.CountdownMessage');
-      iconEls.forEach(el => el.className = 'fas fa-clock');
-      messageEls.forEach(el => el.textContent = message);
+      iconEls.forEach(el => el.className = 'fa-solid fa-clock');
+      messageEls.forEach(el => el.textContent = game.i18n.localize('STREAM_PACER.CountdownMessage'));
+      ixEls.forEach(el => el.textContent = game.i18n.format('STREAM_PACER.TickerIndex', { n: '03' }));
 
       const remaining = state.countdownRemaining;
       if (remaining !== null) {
         const minutes = Math.floor(remaining / 60);
         const seconds = remaining % 60;
-        const timeStr = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        countdownEls.forEach(el => el.textContent = timeStr);
+        countdownEls.forEach(el => el.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`);
 
         this._element.classList.remove('urgency-warning', 'urgency-critical');
         if (remaining <= 10) {
