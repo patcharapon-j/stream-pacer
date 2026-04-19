@@ -1598,6 +1598,136 @@
 }
 
 /* ========================================
+   Dire Peril — Persistent Corner Indicator
+   ======================================== */
+
+.stream-pacer-peril-indicator-wrap {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.stream-pacer-peril-indicator-wrap.visible .stream-pacer-peril-indicator {
+  pointer-events: auto;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.stream-pacer-peril-indicator {
+  min-width: 210px;
+  padding: 9px 14px 9px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #fff;
+  font-family: 'Rajdhani', sans-serif;
+
+  background: linear-gradient(180deg, rgba(45, 10, 90, 0.96), rgba(20, 4, 42, 0.98));
+  border: 1px solid rgba(175, 45, 185, 0.5);
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.55),
+    0 0 24px var(--sp-peril-glow);
+
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+  animation: sp-peril-ind-pulse 2.4s ease-in-out infinite;
+}
+
+.stream-pacer-peril-indicator::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent 0 2px, rgba(255, 255, 255, 0.02) 2px 3px);
+  pointer-events: none;
+}
+
+/* Left edge gradient bar */
+.stream-pacer-peril-indicator::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--sp-peril), var(--sp-peril-red));
+  box-shadow: 0 0 8px var(--sp-peril);
+  animation: sp-peril-ind-bar 1.8s ease-in-out infinite;
+}
+
+.stream-pacer-peril-indicator .peril-ind-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--sp-peril-red);
+  color: var(--sp-peril-red);
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+  font-size: 16px;
+  filter: drop-shadow(0 0 4px var(--sp-peril-red-glow));
+}
+
+.stream-pacer-peril-indicator .peril-ind-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stream-pacer-peril-indicator .peril-ind-header {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 2.5px;
+  color: var(--sp-peril-red);
+  text-transform: uppercase;
+}
+
+.stream-pacer-peril-indicator .peril-ind-main {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+.stream-pacer-peril-indicator .peril-ind-dismiss {
+  margin-left: auto;
+  padding: 2px 5px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.55);
+  background: transparent;
+  border: 1px solid rgba(175, 45, 185, 0.3);
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.stream-pacer-peril-indicator .peril-ind-dismiss:hover {
+  color: #fff;
+  border-color: var(--sp-peril);
+}
+
+@keyframes sp-peril-ind-pulse {
+  0%, 100% {
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.55), 0 0 24px var(--sp-peril-glow);
+  }
+  50% {
+    box-shadow:
+      0 8px 22px rgba(0, 0, 0, 0.55),
+      0 0 34px rgba(175, 45, 185, 0.7),
+      0 0 48px var(--sp-peril-red-glow);
+  }
+}
+
+@keyframes sp-peril-ind-bar {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; }
+}
+
+/* ========================================
    Reduced motion — disable animations for users who prefer it
    ======================================== */
 
