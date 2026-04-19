@@ -1373,6 +1373,125 @@
   27.28%, 100% { opacity: 0; }
 }
 
+/* Settled title composition — appears after impact flash */
+.stream-pacer-peril-stage .peril-title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 22;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  opacity: 0;
+  animation: sp-peril-title-fade 5500ms ease-out forwards;
+}
+
+@keyframes sp-peril-title-fade {
+  0%, 22% { opacity: 0; }
+  28% { opacity: 1; }
+  82% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.stream-pacer-peril-stage .peril-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 6px;
+  color: var(--sp-peril-red);
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 8px;
+  opacity: 0;
+  animation: sp-peril-tag 5500ms ease-out forwards;
+}
+
+@keyframes sp-peril-tag {
+  0%, 38% { opacity: 0; }
+  46% { opacity: 1; }
+  82% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.stream-pacer-peril-stage .peril-word-dire,
+.stream-pacer-peril-stage .peril-word-peril {
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 140px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 8px;
+  text-transform: uppercase;
+  line-height: 0.9;
+  text-shadow:
+    0 0 30px var(--sp-peril-glow),
+    0 0 60px var(--sp-peril-red-glow),
+    0 4px 10px #000;
+  opacity: 0;
+}
+
+.stream-pacer-peril-stage .peril-word-dire {
+  transform: translateX(-800px);
+  animation: sp-peril-word-dire 5500ms cubic-bezier(0.2, 1, 0.3, 1) forwards;
+}
+
+.stream-pacer-peril-stage .peril-word-peril {
+  transform: translateX(800px);
+  animation: sp-peril-word-peril 5500ms cubic-bezier(0.2, 1, 0.3, 1) forwards;
+}
+
+@keyframes sp-peril-word-dire {
+  0%, 27% { opacity: 0; transform: translateX(-800px); }
+  33% { opacity: 1; transform: translateX(-16px); }
+  36% { opacity: 1; transform: translateX(0); }
+  82% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; }
+}
+
+@keyframes sp-peril-word-peril {
+  0%, 29% { opacity: 0; transform: translateX(800px); }
+  35% { opacity: 1; transform: translateX(16px); }
+  38% { opacity: 1; transform: translateX(0); }
+  82% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; }
+}
+
+.stream-pacer-peril-stage .peril-rule {
+  height: 2px;
+  width: 0;
+  background: linear-gradient(90deg, transparent, var(--sp-peril-red) 30%, var(--sp-peril) 50%, var(--sp-peril-red) 70%, transparent);
+  box-shadow: 0 0 10px var(--sp-peril-red-glow);
+  margin: 4px 0;
+  animation: sp-peril-rule 5500ms ease-out forwards;
+}
+
+@keyframes sp-peril-rule {
+  0%, 37% { width: 0; opacity: 0; }
+  42% { width: 360px; opacity: 1; }
+  82% { width: 360px; opacity: 1; }
+  100% { width: 0; opacity: 0; }
+}
+
+.stream-pacer-peril-stage .peril-sub {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 6px;
+  color: var(--sp-peril-bright);
+  text-transform: uppercase;
+  margin-top: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 0;
+  animation: sp-peril-sub 5500ms steps(40) forwards;
+}
+
+@keyframes sp-peril-sub {
+  0%, 45% { max-width: 0; }
+  56% { max-width: 520px; }
+  82% { max-width: 520px; }
+  100% { max-width: 0; }
+}
+
 /* ========================================
    Reduced motion — disable animations for users who prefer it
    ======================================== */
