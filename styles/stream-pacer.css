@@ -1308,6 +1308,71 @@
   100% { opacity: 0; }
 }
 
+/* Letter flash cascade — each letter of DIRE PERIL appears ~120ms, center-stage */
+.stream-pacer-peril-stage .peril-flash-stage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 30;
+  pointer-events: none;
+}
+
+.stream-pacer-peril-stage .peril-l {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1.15);
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 280px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 0.9;
+  text-transform: uppercase;
+  text-shadow:
+    0 0 30px #fff,
+    0 0 60px var(--sp-peril-glow),
+    0 0 100px var(--sp-peril-red-glow);
+  opacity: 0;
+  animation: sp-peril-letter 5500ms linear forwards;
+}
+
+/* Per-letter delays (9 letters: D I R E P E R I L)
+   D 220ms, I 320, R 420, E 520, (gap 100ms), P 720, E 820, R 920, I 1020, L 1120 */
+.stream-pacer-peril-stage .peril-l:nth-child(1) { animation-delay: 220ms; }
+.stream-pacer-peril-stage .peril-l:nth-child(2) { animation-delay: 320ms; }
+.stream-pacer-peril-stage .peril-l:nth-child(3) { animation-delay: 420ms; }
+.stream-pacer-peril-stage .peril-l:nth-child(4) { animation-delay: 520ms; }
+.stream-pacer-peril-stage .peril-l:nth-child(5) { animation-delay: 720ms; }
+.stream-pacer-peril-stage .peril-l:nth-child(6) { animation-delay: 820ms; }
+.stream-pacer-peril-stage .peril-l:nth-child(7) { animation-delay: 920ms; }
+.stream-pacer-peril-stage .peril-l:nth-child(8) { animation-delay: 1020ms; }
+.stream-pacer-peril-stage .peril-l:nth-child(9) { animation-delay: 1120ms; }
+
+@keyframes sp-peril-letter {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(1.15); }
+  0.4% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  1.4% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  2% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Impact flash at 1400–1500ms */
+.stream-pacer-peril-stage .peril-impact {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  background: radial-gradient(ellipse, rgba(255, 255, 255, 0.9), rgba(255, 46, 90, 0.3) 60%, transparent);
+  opacity: 0;
+  animation: sp-peril-impact 5500ms steps(1) forwards;
+}
+
+@keyframes sp-peril-impact {
+  0%, 25.45% { opacity: 0; }
+  25.46%, 27.27% { opacity: 1; }
+  27.28%, 100% { opacity: 0; }
+}
+
 /* ========================================
    Reduced motion — disable animations for users who prefer it
    ======================================== */
