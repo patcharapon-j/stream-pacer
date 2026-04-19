@@ -5,11 +5,13 @@ import { PacerHUD } from './PacerHUD.js';
 import { PacerOverlay } from './PacerOverlay.js';
 import { AudioManager } from './AudioManager.js';
 import { HandRaiseSidebar } from './HandRaiseSidebar.js';
+import { PerilOverlay } from './PerilOverlay.js';
 
 let pacerHUD = null;
 let pacerOverlay = null;
 let audioManager = null;
 let handRaiseSidebar = null;
+let perilOverlay = null;
 let isReady = false;
 let isFirstCanvas = true;
 
@@ -41,6 +43,9 @@ Hooks.once('ready', () => {
     // Initialize overlay for signals
     pacerOverlay = new PacerOverlay();
     pacerOverlay.initialize();
+
+    perilOverlay = new PerilOverlay();
+    perilOverlay.initialize();
   }
 
   // Initialize GM-only components
@@ -65,8 +70,14 @@ Hooks.once('ready', () => {
     hud: pacerHUD,
     overlay: pacerOverlay,
     audio: audioManager,
-    handSidebar: handRaiseSidebar
+    handSidebar: handRaiseSidebar,
+    peril: perilOverlay
   };
+
+  // Late-join: if peril is already active, show the indicator only (no replay).
+  if (!isExempt && PacerManager.getState().direPerilActive) {
+    perilOverlay.showIndicatorOnly();
+  }
 });
 
 // Handle scene changes - reset states if setting enabled
