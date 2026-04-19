@@ -35,6 +35,14 @@ export class PacerOverlay {
     this._element.id = 'stream-pacer-overlay';
     this._element.className = 'stream-pacer-overlay';
 
+    const tint = document.createElement('div');
+    tint.className = 'sp-tint';
+    this._element.appendChild(tint);
+
+    const rail = document.createElement('div');
+    rail.className = 'sp-rail';
+    this._element.appendChild(rail);
+
     this._contentEl = document.createElement('div');
     this._contentEl.className = 'overlay-content';
     this._element.appendChild(this._contentEl);
