@@ -15,19 +15,49 @@ const EVENTS = {
 };
 
 class SocketHandlerClass {
+  constructor() {
+    this._syncReceived = false;
+    this._syncRetryTimer = null;
+    this._syncRetriesLeft = 0;
+  }
+
   initialize() {
     game.socket.on(SOCKET_NAME, (data) => this._handleMessage(data));
 
-    // Request current state from GM when joining
+    // Request current state from GM when joining. Retry a few times in case
+    // the GM's socket handler isn't registered yet when we fire the first one.
     if (!game.user.isGM) {
-      setTimeout(() => {
-        this.requestState();
-      }, 500);
+      this._syncReceived = false;
+      this._syncRetriesLeft = 4;
+      this._scheduleSyncRequest(500);
     }
+  }
+
+  _scheduleSyncRequest(delay) {
+    clearTimeout(this._syncRetryTimer);
+    this._syncRetryTimer = setTimeout(() => {
+      if (this._syncReceived || !game.users.find(u => u.isGM && u.active)) {
+        // Either we got the sync or there's no GM online to answer.
+        clearTimeout(this._syncRetryTimer);
+        this._syncRetryTimer = null;
+        return;
+      }
+      this.requestState();
+      if (this._syncRetriesLeft-- > 0) {
+        this._scheduleSyncRequest(1500);
+      }
+    }, delay);
   }
 
   _handleMessage(data) {
     const { event, payload, senderId } = data;
+
+    // Foundry's socket emit is a broadcast — ignore our own messages so we
+    // don't double-apply state we already set locally.
+    if (senderId === game.user.id) return;
+
+    // GM-only events must originate from a GM client.
+    const senderIsGM = game.users.get(senderId)?.isGM === true;
 
     switch (event) {
       case EVENTS.PLAYER_STATUS_CHANGE:
@@ -35,18 +65,22 @@ class SocketHandlerClass {
         break;
 
       case EVENTS.GM_SOFT_SIGNAL:
+        if (!senderIsGM) break;
         PacerManager.receiveGmSoftSignal();
         break;
 
       case EVENTS.GM_HARD_COUNTDOWN:
+        if (!senderIsGM) break;
         PacerManager.receiveGmHardCountdown(payload.countdownEnd);
         break;
 
       case EVENTS.GM_FLOOR_OPEN:
+        if (!senderIsGM) break;
         PacerManager.receiveGmFloorOpen();
         break;
 
       case EVENTS.GM_CANCEL_SIGNAL:
+        if (!senderIsGM) break;
         PacerManager.receiveGmCancelSignal();
         break;
 
@@ -58,13 +92,17 @@ class SocketHandlerClass {
         break;
 
       case EVENTS.SYNC_STATE:
-        // Only process if this message is for us
-        if (payload.targetUserId === game.user.id) {
+        // Only process if this message is for us and came from a GM
+        if (senderIsGM && payload.targetUserId === game.user.id) {
+          this._syncReceived = true;
+          clearTimeout(this._syncRetryTimer);
+          this._syncRetryTimer = null;
           PacerManager.receiveSyncState(payload.state);
         }
         break;
 
       case EVENTS.RESET_ALL:
+        if (!senderIsGM) break;
         PacerManager.receiveResetAll();
         break;
     }

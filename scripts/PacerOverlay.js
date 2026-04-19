@@ -8,6 +8,10 @@ export class PacerOverlay {
     this._unsubscribe = null;
     this._resizeObserver = null;
     this._segmentCount = 8;
+    // Cached NodeLists; invalidated on every _rebuildSegments().
+    this._messageEls = null;
+    this._countdownEls = null;
+    this._iconEls = null;
   }
 
   initialize() {
@@ -65,6 +69,11 @@ export class PacerOverlay {
     }
     this._contentEl.innerHTML = html;
 
+    // Refresh cached element references after DOM replacement.
+    this._messageEls = this._element.querySelectorAll('.overlay-message');
+    this._countdownEls = this._element.querySelectorAll('.overlay-countdown');
+    this._iconEls = this._element.querySelectorAll('.overlay-icon i');
+
     // Re-apply current state
     this._update(PacerManager.getState());
   }
@@ -83,9 +92,10 @@ export class PacerOverlay {
   _update(state) {
     if (!this._element) return;
 
-    const messageEls = this._element.querySelectorAll('.overlay-message');
-    const countdownEls = this._element.querySelectorAll('.overlay-countdown');
-    const iconEls = this._element.querySelectorAll('.overlay-icon i');
+    // Use cached NodeLists; they're refreshed only when segments rebuild.
+    const messageEls = this._messageEls ?? this._element.querySelectorAll('.overlay-message');
+    const countdownEls = this._countdownEls ?? this._element.querySelectorAll('.overlay-countdown');
+    const iconEls = this._iconEls ?? this._element.querySelectorAll('.overlay-icon i');
 
     if (state.gmSignal === GM_SIGNAL.SOFT) {
       this._element.classList.add('active', 'soft-signal');

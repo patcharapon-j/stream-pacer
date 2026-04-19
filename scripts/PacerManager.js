@@ -282,10 +282,12 @@ class PacerManagerClass {
   _tickCountdown() {
     const remaining = this.getCountdownRemaining();
     if (remaining <= 0) {
+      // Always clear our own interval. Only the GM broadcasts the cancel;
+      // non-GM clients wait for the GM's socket event to arrive.
       this._clearCountdownInterval();
-      // Countdown completed - auto-cancel
       if (game.user.isGM) {
         this.cancelSignal();
+        return;
       }
     }
     this._notifySubscribers();
@@ -325,11 +327,17 @@ class PacerManagerClass {
   _saveToSettings() {
     if (!game.user.isGM) return;
 
-    game.settings.set(MODULE_ID, 'pacerState', {
-      playerStates: this._playerStates,
-      gmSignal: this._gmSignal,
-      countdownEnd: this._countdownEnd
-    });
+    // Debounce rapid bursts (e.g. players toggling status during a countdown)
+    // into a single DB write, while still flushing on a fresh state.
+    clearTimeout(this._saveTimeout);
+    this._saveTimeout = setTimeout(() => {
+      this._saveTimeout = null;
+      game.settings.set(MODULE_ID, 'pacerState', {
+        playerStates: this._playerStates,
+        gmSignal: this._gmSignal,
+        countdownEnd: this._countdownEnd
+      });
+    }, 300);
   }
 }
 

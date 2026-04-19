@@ -195,18 +195,58 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
 
   async _showCountdownDialog() {
     const defaultDuration = game.settings.get(MODULE_ID, 'defaultCountdown');
+    const defaultMinutes = Math.floor(defaultDuration / 60);
 
     const content = `
       <form>
         <div class="form-group">
           <label>${game.i18n.localize('STREAM_PACER.CountdownDuration')}</label>
           <div class="form-fields">
-            <input type="number" name="minutes" value="${Math.floor(defaultDuration / 60)}" min="1" max="10" style="width: 60px">
+            <input type="number" name="minutes" value="${defaultMinutes}" min="1" max="10" style="width: 60px">
             <span>${game.i18n.localize('STREAM_PACER.Minutes')}</span>
           </div>
         </div>
       </form>
     `;
+
+    const readMinutes = (root) => {
+      // v13 DialogV2 passes a native HTMLElement; legacy Dialog passes jQuery.
+      const el = root instanceof HTMLElement
+        ? root
+        : (root?.[0] ?? root);
+      const input = el?.querySelector?.('[name="minutes"]');
+      return parseInt(input?.value) || defaultMinutes || 1;
+    };
+
+    const start = async (minutes) => {
+      const seconds = Math.min(Math.max(minutes, 1), 10) * 60;
+      PacerManager.startCountdown(seconds);
+    };
+
+    // Prefer DialogV2 (v13+) and fall back to the legacy Dialog.
+    const DialogV2 = foundry.applications?.api?.DialogV2;
+    if (DialogV2) {
+      await DialogV2.wait({
+        window: { title: game.i18n.localize('STREAM_PACER.StartCountdown') },
+        content,
+        buttons: [
+          {
+            action: 'start',
+            label: game.i18n.localize('STREAM_PACER.Start'),
+            icon: 'fas fa-play',
+            default: true,
+            callback: (_event, _button, dialog) => start(readMinutes(dialog.element))
+          },
+          {
+            action: 'cancel',
+            label: game.i18n.localize('STREAM_PACER.Cancel'),
+            icon: 'fas fa-times'
+          }
+        ],
+        rejectClose: false
+      });
+      return;
+    }
 
     new Dialog({
       title: game.i18n.localize('STREAM_PACER.StartCountdown'),
@@ -215,15 +255,11 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
         start: {
           icon: '<i class="fas fa-play"></i>',
           label: game.i18n.localize('STREAM_PACER.Start'),
-          callback: (html) => {
-            const minutes = parseInt(html.find('[name="minutes"]').val()) || 1;
-            const seconds = Math.min(Math.max(minutes, 1), 10) * 60;
-            PacerManager.startCountdown(seconds);
-          }
+          callback: (html) => start(readMinutes(html))
         },
         cancel: {
           icon: '<i class="fas fa-times"></i>',
-          label: game.i18n.localize('Cancel')
+          label: game.i18n.localize('STREAM_PACER.Cancel')
         }
       },
       default: 'start'
@@ -248,7 +284,13 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
     const dragHandle = this.element.querySelector('.drag-handle');
     if (!dragHandle) return;
 
-    dragHandle.addEventListener('mousedown', (e) => {
+    // _onRender fires on every subscriber notification (once per countdown tick).
+    // Dedupe by storing the handler on the element and removing it before re-adding.
+    if (dragHandle._pacerDragHandler) {
+      dragHandle.removeEventListener('mousedown', dragHandle._pacerDragHandler);
+    }
+
+    dragHandle._pacerDragHandler = (e) => {
       e.preventDefault();
       this._isDragging = true;
       this._dragStartX = e.clientX;
@@ -265,7 +307,9 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
       // Add document listeners
       document.addEventListener('mousemove', this._boundOnMouseMove);
       document.addEventListener('mouseup', this._boundOnMouseUp);
-    });
+    };
+
+    dragHandle.addEventListener('mousedown', dragHandle._pacerDragHandler);
   }
 
   /**

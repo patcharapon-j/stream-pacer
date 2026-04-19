@@ -83,17 +83,22 @@ export class HandRaiseSidebar {
     if (!this._contentEl) return;
 
     if (this._currentPlayers.length === 0) {
-      this._contentEl.innerHTML = '';
+      this._contentEl.replaceChildren();
       return;
     }
 
-    // Build simple centered content: hand icon + player names
-    const playerNames = this._currentPlayers.map(p => p.name).join(', ');
-    
-    this._contentEl.innerHTML = `
-      <span class="hand-icon"><i class="fas fa-hand-paper"></i></span>
-      <span class="player-names">${playerNames}</span>
-    `;
+    // Build via DOM APIs so player names (world-stored strings) can't inject HTML.
+    const icon = document.createElement('span');
+    icon.className = 'hand-icon';
+    const iconI = document.createElement('i');
+    iconI.className = 'fas fa-hand-paper';
+    icon.appendChild(iconI);
+
+    const names = document.createElement('span');
+    names.className = 'player-names';
+    names.textContent = this._currentPlayers.map(p => p.name).join(', ');
+
+    this._contentEl.replaceChildren(icon, names);
   }
 
   /**
