@@ -52,6 +52,26 @@ class PacerManagerClass {
     }
   }
 
+  /**
+   * Register a callback for Dire Peril declare/dismiss events.
+   * @param {Function} callback - Called with ({ active: boolean }) on state change
+   * @returns {Function} Unsubscribe function
+   */
+  onDirePeril(callback) {
+    this._direPerilCallbacks.add(callback);
+    return () => this._direPerilCallbacks.delete(callback);
+  }
+
+  _notifyDirePeril(active) {
+    for (const callback of this._direPerilCallbacks) {
+      try {
+        callback({ active });
+      } catch (e) {
+        console.error(`${MODULE_ID} | Dire Peril callback error:`, e);
+      }
+    }
+  }
+
   _notifySubscribers() {
     // Use requestAnimationFrame to batch updates and prevent UI freezing
     if (this._notifyPending) return;
@@ -202,12 +222,44 @@ class PacerManagerClass {
     this._playerStates = {};
     this._gmSignal = GM_SIGNAL.NONE;
     this._countdownEnd = null;
+    this._direPerilActive = false;
     this._clearCountdownInterval();
 
     if (broadcast) {
       SocketHandler.emitResetAll();
     }
 
+    this._notifyDirePeril(false);
+    this._notifySubscribers();
+    this._saveToSettings();
+  }
+
+  declareDirePeril(broadcast = true) {
+    if (!game.user.isGM && broadcast) return;
+    if (this._direPerilActive) return; // already active — ignore re-triggers
+
+    this._direPerilActive = true;
+
+    if (broadcast) {
+      SocketHandler.emitDirePerilDeclare();
+    }
+
+    this._notifyDirePeril(true);
+    this._notifySubscribers();
+    this._saveToSettings();
+  }
+
+  dismissDirePeril(broadcast = true) {
+    if (!game.user.isGM && broadcast) return;
+    if (!this._direPerilActive) return;
+
+    this._direPerilActive = false;
+
+    if (broadcast) {
+      SocketHandler.emitDirePerilDismiss();
+    }
+
+    this._notifyDirePeril(false);
     this._notifySubscribers();
     this._saveToSettings();
   }
@@ -263,8 +315,30 @@ class PacerManagerClass {
     this._playerStates = {};
     this._gmSignal = GM_SIGNAL.NONE;
     this._countdownEnd = null;
+    this._direPerilActive = false;
     this._clearCountdownInterval();
+    this._notifyDirePeril(false);
     this._notifySubscribers();
+  }
+
+  receiveDirePerilDeclare() {
+    if (this._direPerilActive) return;
+    this._direPerilActive = true;
+    this._notifyDirePeril(true);
+    this._notifySubscribers();
+    if (game.user.isGM) {
+      this._saveToSettings();
+    }
+  }
+
+  receiveDirePerilDismiss() {
+    if (!this._direPerilActive) return;
+    this._direPerilActive = false;
+    this._notifyDirePeril(false);
+    this._notifySubscribers();
+    if (game.user.isGM) {
+      this._saveToSettings();
+    }
   }
 
   receiveSyncState(state) {
