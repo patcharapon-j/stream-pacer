@@ -8,6 +8,10 @@
     "HasHandRaised": "has their hand raised!",
     "DragToMove": "Drag to move",
 
+    "SectionOperators": "Operators",
+    "SectionStatus": "Status",
+    "SectionCommand": "Command",
+
     "Status": {
       "engaged": "Engaged - actively participating",
       "hand_raised": "Hand Raised - I want to do/say something",
@@ -44,6 +48,23 @@
 
     "Reset": "Reset",
     "ResetTooltip": "Reset all player statuses",
+
+    "TickerIndex": "NOTICE / {n}",
+    "PriorityIndex": "PRIORITY / {n}",
+    "HandRaisedTag": "// HAND RAISED",
+
+    "DirePerilTitle": "Dire Peril",
+    "DirePerilTooltip": "Declare Dire Peril — death is on the table",
+    "DirePerilTag": "// OPERATIONAL HAZARD //",
+    "DirePerilTitleDire": "Dire",
+    "DirePerilTitlePeril": "Peril",
+    "DirePerilSubtitle": "// DEATH IS ON THE TABLE //",
+    "DirePerilHazardActive": "// HAZARD ACTIVE",
+    "DirePerilDismiss": "Dismiss Dire Peril",
+    "DirePerilRunTop": "HAZARD CLASS [LETHAL] // PROTOCOL ENGAGED // ENCOUNTER [CRITICAL] // DEATH IS ON THE TABLE //",
+    "DirePerilRunBottom": "T-0 // THREAT.LEVEL [MAX] // CASUALTY.RISK [CERTAIN] // COMMAND [ENGAGE] //",
+    "DirePerilColumnLeft": "HAZARD / LETHAL / ENGAGED",
+    "DirePerilColumnRight": "THREAT / RISK / ALERT",
 
     "Settings": {
       "DefaultCountdown": "Default Countdown Duration",
