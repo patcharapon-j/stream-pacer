@@ -1520,9 +1520,9 @@
   100% { transform: translate(-50%, -50%) rotate(160deg); }
 }
 
-/* Title composition. Motion is staccato + squash-and-stretch (Japanese
-   kinetic-typography style): hard slam-ins with overshoot, an impact shake
-   when the second line lands, then a dead-frozen pose hold. */
+/* Title composition. Motion is sharp and snappy — no bounce: tight-eased
+   micro-slides, rapid per-character opacity flashing, and letter-spacing
+   tracking that collapses each line into place, then a frozen pose hold. */
 .stream-pacer-peril-stage .pk-stack {
   position: absolute;
   top: 50%;
@@ -1533,17 +1533,17 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  animation: pk-fade-hold 4200ms ease-out forwards, pk-shake 4200ms linear forwards;
+  animation: pk-fade-hold 4200ms ease-out forwards, pk-jolt 4200ms linear forwards;
 }
 
-/* Sharp impact shake on landing, then frozen (anime pose hold). */
-@keyframes pk-shake {
-  0%, 28% { transform: translate(-50%, -50%); }
-  29% { transform: translate(calc(-50% - 7px), calc(-50% + 3px)) scale(1.03); }
-  30% { transform: translate(calc(-50% + 8px), calc(-50% - 2px)) scale(1.05); }
-  31% { transform: translate(calc(-50% - 4px), calc(-50% + 1px)) scale(1.02); }
-  32% { transform: translate(calc(-50% + 2px), -50%) scale(1); }
-  33%, 100% { transform: translate(-50%, -50%); }
+/* Single sharp positional jolt as the second line lands — no scale bounce. */
+@keyframes pk-jolt {
+  0%, 27% { transform: translate(-50%, -50%); }
+  28% { transform: translate(calc(-50% - 6px), -50%); }
+  29% { transform: translate(calc(-50% + 7px), calc(-50% - 2px)); }
+  30% { transform: translate(calc(-50% - 4px), calc(-50% + 2px)); }
+  31% { transform: translate(calc(-50% + 2px), -50%); }
+  32%, 100% { transform: translate(-50%, -50%); }
 }
 
 .stream-pacer-peril-stage .pk-tag {
@@ -1559,12 +1559,13 @@
   clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
   transform-origin: center;
   opacity: 0;
-  animation: pk-tag 4200ms cubic-bezier(0.7, 0, 0.2, 1) forwards;
+  animation: pk-tag 4200ms cubic-bezier(0.7, 0, 0.1, 1) forwards;
 }
 @keyframes pk-tag {
-  0%, 7% { opacity: 0; transform: scaleX(0.12) skewX(-14deg); }
-  11% { opacity: 1; transform: scaleX(1.06) skewX(0deg); }
-  14% { transform: scaleX(1); }
+  0%, 7% { opacity: 0; transform: scaleX(0.1); }
+  12% { opacity: 1; transform: scaleX(1); }
+  13.5% { opacity: 0.35; }
+  15% { opacity: 1; }
   82% { opacity: 1; transform: scaleX(1); }
   100% { opacity: 0; }
 }
@@ -1577,18 +1578,39 @@
   line-height: 0.92;
   font-size: clamp(64px, 15vw, 168px);
   letter-spacing: 0.04em;
-  will-change: filter;
+  will-change: filter, letter-spacing;
 }
 
-/* Impact strobe — quick brightness punches as the title lands. */
-.stream-pacer-peril-stage .pk-line { animation: pk-line-strobe 4200ms steps(1) both; }
-@keyframes pk-line-strobe {
-  0%, 29% { filter: none; }
-  29.5% { filter: brightness(2.6); }
-  30.5% { filter: none; }
-  31.5% { filter: brightness(1.8); }
-  32% { filter: none; }
-  100% { filter: none; }
+/* Tracking collapse + a quick brightness strobe as each line lands. */
+.stream-pacer-peril-stage .pk-line-1 {
+  animation: pk-track-1 4200ms cubic-bezier(0.7, 0, 0.1, 1) both, pk-strobe-1 4200ms steps(1) both;
+}
+.stream-pacer-peril-stage .pk-line-2 {
+  animation: pk-track-2 4200ms cubic-bezier(0.7, 0, 0.1, 1) both, pk-strobe-2 4200ms steps(1) both;
+}
+@keyframes pk-track-1 {
+  0%, 9% { letter-spacing: 0.55em; }
+  25% { letter-spacing: 0.04em; }
+  100% { letter-spacing: 0.04em; }
+}
+@keyframes pk-track-2 {
+  0%, 18% { letter-spacing: 0.55em; }
+  33% { letter-spacing: 0.04em; }
+  100% { letter-spacing: 0.04em; }
+}
+@keyframes pk-strobe-1 {
+  0%, 17% { filter: none; }
+  18% { filter: brightness(2.4); }
+  19% { filter: none; }
+  20% { filter: brightness(1.7); }
+  21%, 100% { filter: none; }
+}
+@keyframes pk-strobe-2 {
+  0%, 27% { filter: none; }
+  28% { filter: brightness(2.6); }
+  29% { filter: none; }
+  30% { filter: brightness(1.8); }
+  31%, 100% { filter: none; }
 }
 
 .stream-pacer-peril-stage .pk-l {
@@ -1599,23 +1621,24 @@
   text-shadow: 0 0 30px var(--sp-peril-glow), 0 0 70px var(--sp-peril-red-glow), 0 4px 10px #000;
 }
 
-/* Line 1 — staccato vertical drop with squash-and-stretch overshoot. */
+/* Line 1 — sharp downward micro-slide + rapid opacity flash. */
 .stream-pacer-peril-stage .pk-line-1 .pk-l {
-  animation: pk-slam-y 300ms cubic-bezier(0.3, 0, 0.1, 1) both;
-  animation-delay: calc(460ms + var(--i) * 34ms);
+  animation: pk-char-y 240ms cubic-bezier(0.7, 0, 0.1, 1) both;
+  animation-delay: calc(460ms + var(--i) * 30ms);
 }
-@keyframes pk-slam-y {
-  0% { opacity: 0; transform: translateY(-0.85em) scaleY(2.3) scaleX(0.68); filter: blur(6px); }
-  45% { opacity: 1; filter: blur(0); }
-  68% { transform: translateY(0.06em) scaleY(0.8) scaleX(1.12); }
-  84% { transform: translateY(0) scaleY(1.07) scaleX(0.97); }
-  100% { opacity: 1; transform: none; filter: blur(0); }
+@keyframes pk-char-y {
+  0% { opacity: 0; transform: translateY(-0.16em); filter: blur(5px); }
+  35% { opacity: 1; transform: translateY(0); filter: blur(0); }
+  48% { opacity: 0.2; }
+  60% { opacity: 1; }
+  78% { opacity: 0.55; }
+  100% { opacity: 1; transform: translateY(0); filter: blur(0); }
 }
 
-/* Line 2 — horizontal streak slam with a heavier RGB-split shadow. */
+/* Line 2 — sharp sideways micro-slide + flash, heavier RGB-split shadow. */
 .stream-pacer-peril-stage .pk-line-2 .pk-l {
-  animation: pk-slam-x 320ms cubic-bezier(0.3, 0, 0.1, 1) both;
-  animation-delay: calc(820ms + var(--i) * 34ms);
+  animation: pk-char-x 250ms cubic-bezier(0.7, 0, 0.1, 1) both;
+  animation-delay: calc(820ms + var(--i) * 30ms);
   text-shadow:
     -3px 0 var(--sp-peril-red),
     2px 0 var(--sp-peril-ghost),
@@ -1623,12 +1646,13 @@
     0 0 70px var(--sp-peril-red-glow),
     0 4px 10px #000;
 }
-@keyframes pk-slam-x {
-  0% { opacity: 0; transform: translateX(0.55em) scaleX(2.8); filter: blur(8px); }
-  45% { opacity: 1; filter: blur(0); }
-  70% { transform: translateX(-0.05em) scaleX(0.84); }
-  86% { transform: translateX(0.02em) scaleX(1.06); }
-  100% { opacity: 1; transform: none; filter: blur(0); }
+@keyframes pk-char-x {
+  0% { opacity: 0; transform: translateX(0.18em); filter: blur(6px); }
+  35% { opacity: 1; transform: translateX(0); filter: blur(0); }
+  48% { opacity: 0.18; }
+  60% { opacity: 1; }
+  78% { opacity: 0.5; }
+  100% { opacity: 1; transform: translateX(0); filter: blur(0); }
 }
 
 .stream-pacer-peril-stage .pk-rule {
