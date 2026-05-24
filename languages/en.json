@@ -89,6 +89,11 @@
       "PerilColor": "Dire Peril Color",
       "PerilWebGL": "Dire Peril WebGL Effect",
       "PerilWebGLHint": "Render the cinematic WebGL danger field during the Dire Peril reveal. Disable on low-end machines.",
+      "PerilTextHint": "Customize the Dire Peril reveal text (GM only — shared with all players). Leave a field blank to use the default.",
+      "PerilTextDire": "Title — Line 1",
+      "PerilTextPeril": "Title — Line 2",
+      "PerilTextTag": "Hazard Tag",
+      "PerilTextSubtitle": "Subtitle",
       "Preset": {
         "arknights-amber": "Arknights Amber",
         "endfield-blue": "Endfield Blue",

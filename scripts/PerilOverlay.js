@@ -16,6 +16,25 @@ function renderHbs(path, ctx) {
   return ns ? ns(path, ctx) : renderTemplate(path, ctx);
 }
 
+/** Read a world-scoped text setting, falling back to the localized default. */
+function settingOrLocalized(key, i18nKey) {
+  let value = '';
+  try {
+    value = (game.settings.get(MODULE_ID, key) || '').trim();
+  } catch (e) {
+    /* settings not ready */
+  }
+  return value || game.i18n.localize(i18nKey);
+}
+
+/** Split a word into { ch, i } entries for the staggered letter cascade. */
+function toLetters(word) {
+  return Array.from(String(word || '')).map((ch, i) => ({
+    ch: ch === ' ' ? ' ' : ch,
+    i
+  }));
+}
+
 export class PerilOverlay {
   constructor() {
     this._stageEl = null;
@@ -89,18 +108,35 @@ export class PerilOverlay {
     this._scheduleHandoff(token);
   }
 
+  _resolveText() {
+    const dire = settingOrLocalized('perilTextDire', 'STREAM_PACER.DirePerilTitleDire');
+    const peril = settingOrLocalized('perilTextPeril', 'STREAM_PACER.DirePerilTitlePeril');
+    return {
+      dire,
+      peril,
+      title: `${dire} ${peril}`.trim(),
+      tag: settingOrLocalized('perilTextTag', 'STREAM_PACER.DirePerilTag'),
+      subtitle: settingOrLocalized('perilTextSubtitle', 'STREAM_PACER.DirePerilSubtitle')
+    };
+  }
+
   async _renderStage(token) {
     if (!this._stageEl) this._createStageContainer();
 
+    const text = this._resolveText();
+    const direLetters = toLetters(text.dire);
+    const perilLetters = toLetters(text.peril);
+
     const context = {
-      tag: game.i18n.localize('STREAM_PACER.DirePerilTag'),
-      wordDire: game.i18n.localize('STREAM_PACER.DirePerilTitleDire'),
-      wordPeril: game.i18n.localize('STREAM_PACER.DirePerilTitlePeril'),
-      subtitle: game.i18n.localize('STREAM_PACER.DirePerilSubtitle'),
+      tag: text.tag,
+      subtitle: text.subtitle,
+      marquee: text.title || 'DIRE PERIL',
+      direLetters,
+      perilLetters,
+      direCount: direLetters.length,
+      perilCount: perilLetters.length,
       runTop: game.i18n.localize('STREAM_PACER.DirePerilRunTop'),
-      runBottom: game.i18n.localize('STREAM_PACER.DirePerilRunBottom'),
-      columnLeft: game.i18n.localize('STREAM_PACER.DirePerilColumnLeft'),
-      columnRight: game.i18n.localize('STREAM_PACER.DirePerilColumnRight')
+      runBottom: game.i18n.localize('STREAM_PACER.DirePerilRunBottom')
     };
 
     const html = await renderHbs(STAGE_TEMPLATE, context);
@@ -138,9 +174,10 @@ export class PerilOverlay {
     const token = this._activationToken || 1;
     if (!this._activationToken) this._activationToken = token;
 
+    const text = this._resolveText();
     const context = {
       isGM: game.user.isGM,
-      label: game.i18n.localize('STREAM_PACER.DirePerilTitle'),
+      label: text.title || game.i18n.localize('STREAM_PACER.DirePerilTitle'),
       header: game.i18n.localize('STREAM_PACER.DirePerilHazardActive'),
       dismissTooltip: game.i18n.localize('STREAM_PACER.DirePerilDismiss')
     };

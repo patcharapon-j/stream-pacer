@@ -74,6 +74,15 @@ async function saveAppearance(_event, _form, formData) {
   if (data.accentColor) await game.settings.set(MODULE_ID, 'accentColor', data.accentColor);
   if (data.perilColor) await game.settings.set(MODULE_ID, 'perilColor', data.perilColor);
   await game.settings.set(MODULE_ID, 'perilWebGLEnabled', data.perilWebGLEnabled === true);
+
+  // Dire Peril text is world-scoped — only GMs may write it.
+  if (game.user.isGM) {
+    await game.settings.set(MODULE_ID, 'perilTextDire', (data.perilTextDire ?? '').trim());
+    await game.settings.set(MODULE_ID, 'perilTextPeril', (data.perilTextPeril ?? '').trim());
+    await game.settings.set(MODULE_ID, 'perilTextTag', (data.perilTextTag ?? '').trim());
+    await game.settings.set(MODULE_ID, 'perilTextSubtitle', (data.perilTextSubtitle ?? '').trim());
+  }
+
   ThemeManager.apply();
 }
 
@@ -122,7 +131,16 @@ class AppearanceConfig extends HandlebarsApplicationMixin(ApplicationV2) {
       accentColor: game.settings.get(MODULE_ID, 'accentColor'),
       perilColor: game.settings.get(MODULE_ID, 'perilColor'),
       perilWebGLEnabled: game.settings.get(MODULE_ID, 'perilWebGLEnabled'),
-      isCustom: current === 'custom'
+      isCustom: current === 'custom',
+      isGM: game.user.isGM,
+      perilTextDire: game.settings.get(MODULE_ID, 'perilTextDire'),
+      perilTextPeril: game.settings.get(MODULE_ID, 'perilTextPeril'),
+      perilTextTag: game.settings.get(MODULE_ID, 'perilTextTag'),
+      perilTextSubtitle: game.settings.get(MODULE_ID, 'perilTextSubtitle'),
+      perilTextDirePlaceholder: game.i18n.localize('STREAM_PACER.DirePerilTitleDire'),
+      perilTextPerilPlaceholder: game.i18n.localize('STREAM_PACER.DirePerilTitlePeril'),
+      perilTextTagPlaceholder: game.i18n.localize('STREAM_PACER.DirePerilTag'),
+      perilTextSubtitlePlaceholder: game.i18n.localize('STREAM_PACER.DirePerilSubtitle')
     };
   }
 }
@@ -159,6 +177,17 @@ export function registerSettings() {
     type: Boolean,
     default: true
   });
+
+  // Dire Peril display text — world-scoped so the whole table sees the same
+  // reveal. Empty string falls back to the localized default at render time.
+  for (const key of ['perilTextDire', 'perilTextPeril', 'perilTextTag', 'perilTextSubtitle']) {
+    game.settings.register(MODULE_ID, key, {
+      scope: 'world',
+      config: false,
+      type: String,
+      default: ''
+    });
+  }
 
   game.settings.registerMenu(MODULE_ID, 'appearanceMenu', {
     name: 'STREAM_PACER.Settings.Appearance',
