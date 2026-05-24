@@ -1520,7 +1520,9 @@
   100% { transform: translate(-50%, -50%) rotate(160deg); }
 }
 
-/* Title composition. */
+/* Title composition. Motion is staccato + squash-and-stretch (Japanese
+   kinetic-typography style): hard slam-ins with overshoot, an impact shake
+   when the second line lands, then a dead-frozen pose hold. */
 .stream-pacer-peril-stage .pk-stack {
   position: absolute;
   top: 50%;
@@ -1531,13 +1533,17 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  animation: pk-fade-hold 4200ms ease-out forwards, pk-breathe 4200ms ease-in-out forwards;
+  animation: pk-fade-hold 4200ms ease-out forwards, pk-shake 4200ms linear forwards;
 }
 
-@keyframes pk-breathe {
-  0%, 36% { transform: translate(-50%, -50%) scale(1); }
-  40% { transform: translate(-50%, -50%) scale(1.015); }
-  46%, 100% { transform: translate(-50%, -50%) scale(1); }
+/* Sharp impact shake on landing, then frozen (anime pose hold). */
+@keyframes pk-shake {
+  0%, 28% { transform: translate(-50%, -50%); }
+  29% { transform: translate(calc(-50% - 7px), calc(-50% + 3px)) scale(1.03); }
+  30% { transform: translate(calc(-50% + 8px), calc(-50% - 2px)) scale(1.05); }
+  31% { transform: translate(calc(-50% - 4px), calc(-50% + 1px)) scale(1.02); }
+  32% { transform: translate(calc(-50% + 2px), -50%) scale(1); }
+  33%, 100% { transform: translate(-50%, -50%); }
 }
 
 .stream-pacer-peril-stage .pk-tag {
@@ -1551,13 +1557,15 @@
   padding: 4px 14px;
   border: 1px solid var(--sp-peril-red-glow);
   clip-path: polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px);
+  transform-origin: center;
   opacity: 0;
-  animation: pk-tag 4200ms ease-out forwards;
+  animation: pk-tag 4200ms cubic-bezier(0.7, 0, 0.2, 1) forwards;
 }
 @keyframes pk-tag {
-  0%, 10% { opacity: 0; transform: translateY(-8px); }
-  16% { opacity: 1; transform: translateY(0); }
-  82% { opacity: 1; transform: translateY(0); }
+  0%, 7% { opacity: 0; transform: scaleX(0.12) skewX(-14deg); }
+  11% { opacity: 1; transform: scaleX(1.06) skewX(0deg); }
+  14% { transform: scaleX(1); }
+  82% { opacity: 1; transform: scaleX(1); }
   100% { opacity: 0; }
 }
 
@@ -1569,6 +1577,18 @@
   line-height: 0.92;
   font-size: clamp(64px, 15vw, 168px);
   letter-spacing: 0.04em;
+  will-change: filter;
+}
+
+/* Impact strobe — quick brightness punches as the title lands. */
+.stream-pacer-peril-stage .pk-line { animation: pk-line-strobe 4200ms steps(1) both; }
+@keyframes pk-line-strobe {
+  0%, 29% { filter: none; }
+  29.5% { filter: brightness(2.6); }
+  30.5% { filter: none; }
+  31.5% { filter: brightness(1.8); }
+  32% { filter: none; }
+  100% { filter: none; }
 }
 
 .stream-pacer-peril-stage .pk-l {
@@ -1577,12 +1597,25 @@
   opacity: 0;
   color: #fff;
   text-shadow: 0 0 30px var(--sp-peril-glow), 0 0 70px var(--sp-peril-red-glow), 0 4px 10px #000;
-  animation: pk-letter 640ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.stream-pacer-peril-stage .pk-line-1 .pk-l { animation-delay: calc(640ms + var(--i) * 60ms); }
+/* Line 1 — staccato vertical drop with squash-and-stretch overshoot. */
+.stream-pacer-peril-stage .pk-line-1 .pk-l {
+  animation: pk-slam-y 300ms cubic-bezier(0.3, 0, 0.1, 1) both;
+  animation-delay: calc(460ms + var(--i) * 34ms);
+}
+@keyframes pk-slam-y {
+  0% { opacity: 0; transform: translateY(-0.85em) scaleY(2.3) scaleX(0.68); filter: blur(6px); }
+  45% { opacity: 1; filter: blur(0); }
+  68% { transform: translateY(0.06em) scaleY(0.8) scaleX(1.12); }
+  84% { transform: translateY(0) scaleY(1.07) scaleX(0.97); }
+  100% { opacity: 1; transform: none; filter: blur(0); }
+}
+
+/* Line 2 — horizontal streak slam with a heavier RGB-split shadow. */
 .stream-pacer-peril-stage .pk-line-2 .pk-l {
-  animation-delay: calc(1080ms + var(--i) * 60ms);
+  animation: pk-slam-x 320ms cubic-bezier(0.3, 0, 0.1, 1) both;
+  animation-delay: calc(820ms + var(--i) * 34ms);
   text-shadow:
     -3px 0 var(--sp-peril-red),
     2px 0 var(--sp-peril-ghost),
@@ -1590,10 +1623,11 @@
     0 0 70px var(--sp-peril-red-glow),
     0 4px 10px #000;
 }
-
-@keyframes pk-letter {
-  0% { opacity: 0; transform: translateY(0.4em) scale(1.4); filter: blur(14px); }
-  60% { opacity: 1; filter: blur(0); }
+@keyframes pk-slam-x {
+  0% { opacity: 0; transform: translateX(0.55em) scaleX(2.8); filter: blur(8px); }
+  45% { opacity: 1; filter: blur(0); }
+  70% { transform: translateX(-0.05em) scaleX(0.84); }
+  86% { transform: translateX(0.02em) scaleX(1.06); }
   100% { opacity: 1; transform: none; filter: blur(0); }
 }
 
@@ -1603,11 +1637,12 @@
   margin: 10px 0;
   background: linear-gradient(90deg, transparent, var(--sp-peril-red) 30%, var(--sp-peril) 50%, var(--sp-peril-red) 70%, transparent);
   box-shadow: 0 0 12px var(--sp-peril-red-glow);
-  animation: pk-rule 4200ms cubic-bezier(0.2, 1, 0.3, 1) forwards;
+  animation: pk-rule 4200ms cubic-bezier(0.7, 0, 0.15, 1) forwards;
 }
 @keyframes pk-rule {
-  0%, 22% { width: 0; opacity: 0; }
-  34% { width: min(440px, 60vw); opacity: 1; }
+  0%, 19% { width: 0; opacity: 0; }
+  23% { width: min(500px, 66vw); opacity: 1; }
+  26% { width: min(440px, 60vw); opacity: 1; }
   82% { width: min(440px, 60vw); opacity: 1; }
   100% { width: min(440px, 60vw); opacity: 0; }
 }
@@ -1622,16 +1657,16 @@
   max-width: 0;
   white-space: nowrap;
   overflow: hidden;
-  animation: pk-sub 4200ms steps(36) forwards;
+  animation: pk-sub 4200ms steps(24) forwards;
 }
 @keyframes pk-sub {
-  0%, 40% { max-width: 0; }
-  56% { max-width: 620px; }
+  0%, 33% { max-width: 0; }
+  44% { max-width: 620px; }
   82% { max-width: 620px; }
   100% { max-width: 0; }
 }
 
-/* Impact flash — declare hit, then the second-word slam. */
+/* Impact flash — declare hit, then the second-line slam. */
 .stream-pacer-peril-stage .pk-flash {
   position: absolute;
   inset: 0;
@@ -1645,9 +1680,9 @@
   0%, 3% { opacity: 0; }
   3.5% { opacity: 0.85; }
   6% { opacity: 0; }
-  33% { opacity: 0; }
-  34% { opacity: 0.9; }
-  37% { opacity: 0; }
+  28% { opacity: 0; }
+  29% { opacity: 0.95; }
+  31% { opacity: 0; }
   100% { opacity: 0; }
 }
 
