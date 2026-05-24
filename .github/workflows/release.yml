@@ -1,0 +1,76 @@
+name: Release
+
+# Manual trigger only — run from the Actions tab.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release version (e.g. 1.2.2). Leave blank to use the version in module.json."
+        required: false
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Determine version
+        id: version
+        run: |
+          INPUT_VERSION="${{ inputs.version }}"
+          if [ -n "$INPUT_VERSION" ]; then
+            VERSION="$INPUT_VERSION"
+          else
+            VERSION=$(jq -r '.version' module.json)
+          fi
+          VERSION="${VERSION#v}"
+          if [ -z "$VERSION" ] || [ "$VERSION" = "null" ]; then
+            echo "Could not determine a version." >&2
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Releasing version $VERSION"
+
+      - name: Update module.json
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+          REPO_URL: https://github.com/${{ github.repository }}
+        run: |
+          jq \
+            --arg version "$VERSION" \
+            --arg url "$REPO_URL" \
+            --arg manifest "$REPO_URL/releases/latest/download/module.json" \
+            --arg download "$REPO_URL/releases/download/v$VERSION/module.zip" \
+            '.version = $version | .url = $url | .manifest = $manifest | .download = $download' \
+            module.json > module.json.tmp
+          mv module.json.tmp module.json
+          echo "Updated module.json:"
+          cat module.json
+
+      - name: Build module.zip
+        run: |
+          zip -r module.zip \
+            module.json \
+            scripts \
+            styles \
+            templates \
+            languages \
+            LICENSE \
+            README.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: ${{ steps.version.outputs.tag }}
+          draft: false
+          prerelease: false
+          files: |
+            module.json
+            module.zip
