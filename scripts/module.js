@@ -6,6 +6,7 @@ import { PacerOverlay } from './PacerOverlay.js';
 import { AudioManager } from './AudioManager.js';
 import { HandRaiseSidebar } from './HandRaiseSidebar.js';
 import { PerilOverlay } from './PerilOverlay.js';
+import { ThemeManager } from './ThemeManager.js';
 
 let pacerHUD = null;
 let pacerOverlay = null;
@@ -23,6 +24,9 @@ Hooks.once('init', () => {
 Hooks.once('ready', () => {
   console.log(`${MODULE_ID} | Stream Pacer Ready`);
   isReady = true;
+
+  // Apply the user's chosen tech-display palette before any UI renders.
+  ThemeManager.initialize();
 
   // Check if current user is exempt
   const exemptUsers = game.settings.get(MODULE_ID, 'exemptUsers');
@@ -71,7 +75,8 @@ Hooks.once('ready', () => {
     overlay: pacerOverlay,
     audio: audioManager,
     handSidebar: handRaiseSidebar,
-    peril: perilOverlay
+    peril: perilOverlay,
+    theme: ThemeManager
   };
 
   // Late-join: if peril is already active, show the indicator only (no replay).

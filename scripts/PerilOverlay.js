@@ -1,5 +1,6 @@
 import { MODULE_ID } from './settings.js';
 import { PacerManager } from './PacerManager.js';
+import { PerilWebGL } from './PerilWebGL.js';
 
 const STAGE_TEMPLATE = `modules/${MODULE_ID}/templates/peril-stage.hbs`;
 const INDICATOR_TEMPLATE = `modules/${MODULE_ID}/templates/peril-indicator.hbs`;
@@ -15,6 +16,25 @@ function renderHbs(path, ctx) {
   return ns ? ns(path, ctx) : renderTemplate(path, ctx);
 }
 
+/** Read a world-scoped text setting, falling back to the localized default. */
+function settingOrLocalized(key, i18nKey) {
+  let value = '';
+  try {
+    value = (game.settings.get(MODULE_ID, key) || '').trim();
+  } catch (e) {
+    /* settings not ready */
+  }
+  return value || game.i18n.localize(i18nKey);
+}
+
+/** Split a word into { ch, i } entries for the staggered letter cascade. */
+function toLetters(word) {
+  return Array.from(String(word || '')).map((ch, i) => ({
+    ch: ch === ' ' ? ' ' : ch,
+    i
+  }));
+}
+
 export class PerilOverlay {
   constructor() {
     this._stageEl = null;
@@ -22,9 +42,20 @@ export class PerilOverlay {
     this._stageTimer = null;
     this._indicatorTimer = null;
     this._unsubscribe = null;
+    this._webgl = new PerilWebGL();
     // Incremented whenever peril becomes inactive; in-flight async renders
     // check this token before writing DOM so a dismiss can cancel them.
     this._activationToken = 0;
+  }
+
+  /** WebGL backdrop runs unless disabled in settings or reduced-motion is on. */
+  _webglEnabled() {
+    try {
+      if (!game.settings.get(MODULE_ID, 'perilWebGLEnabled')) return false;
+    } catch (e) {
+      /* setting not ready — default to on */
+    }
+    return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 
   initialize() {
@@ -71,23 +102,48 @@ export class PerilOverlay {
 
   async _playStageAndShowIndicator() {
     const token = ++this._activationToken;
+    if (this._webglEnabled()) this._webgl.play(STAGE_DURATION_MS);
     await this._renderStage(token);
     if (token !== this._activationToken) return;
     this._scheduleHandoff(token);
   }
 
+  _resolveText() {
+    const dire = settingOrLocalized('perilTextDire', 'STREAM_PACER.DirePerilTitleDire');
+    const peril = settingOrLocalized('perilTextPeril', 'STREAM_PACER.DirePerilTitlePeril');
+    return {
+      dire,
+      peril,
+      title: `${dire} ${peril}`.trim(),
+      tag: settingOrLocalized('perilTextTag', 'STREAM_PACER.DirePerilTag'),
+      subtitle: settingOrLocalized('perilTextSubtitle', 'STREAM_PACER.DirePerilSubtitle')
+    };
+  }
+
   async _renderStage(token) {
     if (!this._stageEl) this._createStageContainer();
 
+    const text = this._resolveText();
+    const direLetters = toLetters(text.dire);
+    const perilLetters = toLetters(text.peril);
+
+    // Big center flash montage — every character (spaces dropped) in order.
+    const flashLetters = Array.from(`${text.dire}${text.peril}`)
+      .filter((ch) => ch !== ' ')
+      .map((ch, i) => ({ ch, i }));
+
     const context = {
-      tag: game.i18n.localize('STREAM_PACER.DirePerilTag'),
-      wordDire: game.i18n.localize('STREAM_PACER.DirePerilTitleDire'),
-      wordPeril: game.i18n.localize('STREAM_PACER.DirePerilTitlePeril'),
-      subtitle: game.i18n.localize('STREAM_PACER.DirePerilSubtitle'),
+      tag: text.tag,
+      subtitle: text.subtitle,
+      marquee: text.title || 'DIRE PERIL',
+      direLetters,
+      perilLetters,
+      direCount: direLetters.length,
+      perilCount: perilLetters.length,
+      flashLetters,
+      flashCount: flashLetters.length,
       runTop: game.i18n.localize('STREAM_PACER.DirePerilRunTop'),
-      runBottom: game.i18n.localize('STREAM_PACER.DirePerilRunBottom'),
-      columnLeft: game.i18n.localize('STREAM_PACER.DirePerilColumnLeft'),
-      columnRight: game.i18n.localize('STREAM_PACER.DirePerilColumnRight')
+      runBottom: game.i18n.localize('STREAM_PACER.DirePerilRunBottom')
     };
 
     const html = await renderHbs(STAGE_TEMPLATE, context);
@@ -125,9 +181,10 @@ export class PerilOverlay {
     const token = this._activationToken || 1;
     if (!this._activationToken) this._activationToken = token;
 
+    const text = this._resolveText();
     const context = {
       isGM: game.user.isGM,
-      label: game.i18n.localize('STREAM_PACER.DirePerilTitle'),
+      label: text.title || game.i18n.localize('STREAM_PACER.DirePerilTitle'),
       header: game.i18n.localize('STREAM_PACER.DirePerilHazardActive'),
       dismissTooltip: game.i18n.localize('STREAM_PACER.DirePerilDismiss')
     };
@@ -151,6 +208,7 @@ export class PerilOverlay {
     this._activationToken++;
     clearTimeout(this._indicatorTimer);
     clearTimeout(this._stageTimer);
+    this._webgl.stop();
     this._unmountStage();
     if (!this._indicatorEl) return;
     this._indicatorEl.classList.remove('visible');
@@ -162,6 +220,10 @@ export class PerilOverlay {
   destroy() {
     clearTimeout(this._stageTimer);
     clearTimeout(this._indicatorTimer);
+    if (this._webgl) {
+      this._webgl.destroy();
+      this._webgl = null;
+    }
     if (this._unsubscribe) {
       this._unsubscribe();
       this._unsubscribe = null;

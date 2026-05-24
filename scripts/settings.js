@@ -1,3 +1,5 @@
+import { ThemeManager, THEME_PRESETS, DEFAULT_PRESET } from './ThemeManager.js';
+
 export const MODULE_ID = 'stream-pacer';
 
 export const PLAYER_STATUS = {
@@ -66,7 +68,137 @@ class ExemptUsersConfig extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 }
 
+async function saveAppearance(_event, _form, formData) {
+  const data = formData?.object ?? {};
+  await game.settings.set(MODULE_ID, 'themePreset', data.themePreset || DEFAULT_PRESET);
+  if (data.accentColor) await game.settings.set(MODULE_ID, 'accentColor', data.accentColor);
+  if (data.perilColor) await game.settings.set(MODULE_ID, 'perilColor', data.perilColor);
+  await game.settings.set(MODULE_ID, 'perilWebGLEnabled', data.perilWebGLEnabled === true);
+
+  // Dire Peril text is world-scoped — only GMs may write it.
+  if (game.user.isGM) {
+    await game.settings.set(MODULE_ID, 'perilTextDire', (data.perilTextDire ?? '').trim());
+    await game.settings.set(MODULE_ID, 'perilTextPeril', (data.perilTextPeril ?? '').trim());
+    await game.settings.set(MODULE_ID, 'perilTextTag', (data.perilTextTag ?? '').trim());
+    await game.settings.set(MODULE_ID, 'perilTextSubtitle', (data.perilTextSubtitle ?? '').trim());
+  }
+
+  ThemeManager.apply();
+}
+
+class AppearanceConfig extends HandlebarsApplicationMixin(ApplicationV2) {
+  static DEFAULT_OPTIONS = {
+    id: 'stream-pacer-appearance',
+    classes: ['stream-pacer-appearance'],
+    tag: 'form',
+    window: {
+      title: 'STREAM_PACER.Settings.Appearance',
+      icon: 'fas fa-palette'
+    },
+    position: {
+      width: 460,
+      height: 'auto'
+    },
+    form: {
+      handler: saveAppearance,
+      closeOnSubmit: true
+    }
+  };
+
+  static PARTS = {
+    form: {
+      template: `modules/${MODULE_ID}/templates/appearance-config.hbs`
+    }
+  };
+
+  async _prepareContext() {
+    const current = game.settings.get(MODULE_ID, 'themePreset') || DEFAULT_PRESET;
+    const presets = Object.keys(THEME_PRESETS).map(key => ({
+      key,
+      label: game.i18n.localize(`STREAM_PACER.Settings.Preset.${key}`),
+      selected: key === current,
+      swatch: THEME_PRESETS[key]
+    }));
+    presets.push({
+      key: 'custom',
+      label: game.i18n.localize('STREAM_PACER.Settings.Preset.custom'),
+      selected: current === 'custom',
+      swatch: null
+    });
+
+    return {
+      presets,
+      accentColor: game.settings.get(MODULE_ID, 'accentColor'),
+      perilColor: game.settings.get(MODULE_ID, 'perilColor'),
+      perilWebGLEnabled: game.settings.get(MODULE_ID, 'perilWebGLEnabled'),
+      isCustom: current === 'custom',
+      isGM: game.user.isGM,
+      perilTextDire: game.settings.get(MODULE_ID, 'perilTextDire'),
+      perilTextPeril: game.settings.get(MODULE_ID, 'perilTextPeril'),
+      perilTextTag: game.settings.get(MODULE_ID, 'perilTextTag'),
+      perilTextSubtitle: game.settings.get(MODULE_ID, 'perilTextSubtitle'),
+      perilTextDirePlaceholder: game.i18n.localize('STREAM_PACER.DirePerilTitleDire'),
+      perilTextPerilPlaceholder: game.i18n.localize('STREAM_PACER.DirePerilTitlePeril'),
+      perilTextTagPlaceholder: game.i18n.localize('STREAM_PACER.DirePerilTag'),
+      perilTextSubtitlePlaceholder: game.i18n.localize('STREAM_PACER.DirePerilSubtitle')
+    };
+  }
+}
+
 export function registerSettings() {
+  // --- Appearance / Tech Display ---
+  game.settings.register(MODULE_ID, 'themePreset', {
+    scope: 'client',
+    config: false,
+    type: String,
+    default: DEFAULT_PRESET,
+    onChange: () => ThemeManager.apply()
+  });
+
+  game.settings.register(MODULE_ID, 'accentColor', {
+    scope: 'client',
+    config: false,
+    type: String,
+    default: THEME_PRESETS[DEFAULT_PRESET].accent,
+    onChange: () => ThemeManager.apply()
+  });
+
+  game.settings.register(MODULE_ID, 'perilColor', {
+    scope: 'client',
+    config: false,
+    type: String,
+    default: THEME_PRESETS[DEFAULT_PRESET].peril,
+    onChange: () => ThemeManager.apply()
+  });
+
+  game.settings.register(MODULE_ID, 'perilWebGLEnabled', {
+    scope: 'client',
+    config: false,
+    type: Boolean,
+    default: true
+  });
+
+  // Dire Peril display text — world-scoped so the whole table sees the same
+  // reveal. Empty string falls back to the localized default at render time.
+  for (const key of ['perilTextDire', 'perilTextPeril', 'perilTextTag', 'perilTextSubtitle']) {
+    game.settings.register(MODULE_ID, key, {
+      scope: 'world',
+      config: false,
+      type: String,
+      default: ''
+    });
+  }
+
+  game.settings.registerMenu(MODULE_ID, 'appearanceMenu', {
+    name: 'STREAM_PACER.Settings.Appearance',
+    label: 'STREAM_PACER.Settings.AppearanceLabel',
+    hint: 'STREAM_PACER.Settings.AppearanceHint',
+    icon: 'fas fa-palette',
+    type: AppearanceConfig,
+    restricted: false
+  });
+
+
   // Hidden state storage for persistence
   game.settings.register(MODULE_ID, 'pacerState', {
     name: 'Pacer State',
