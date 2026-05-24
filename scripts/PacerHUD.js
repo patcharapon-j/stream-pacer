@@ -206,7 +206,7 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
         <div class="form-group">
           <label>${game.i18n.localize('STREAM_PACER.CountdownDuration')}</label>
           <div class="form-fields">
-            <input type="number" name="minutes" value="${defaultMinutes}" min="1" max="10" style="width: 60px">
+            <input type="number" name="minutes" value="${defaultMinutes}" min="1" style="width: 60px">
             <span>${game.i18n.localize('STREAM_PACER.Minutes')}</span>
           </div>
         </div>
@@ -223,7 +223,7 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
     };
 
     const start = async (minutes) => {
-      const seconds = Math.min(Math.max(minutes, 1), 10) * 60;
+      const seconds = Math.max(minutes, 1) * 60;
       PacerManager.startCountdown(seconds);
     };
 

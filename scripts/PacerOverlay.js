@@ -13,6 +13,10 @@ export class PacerOverlay {
     this._countdownEls = null;
     this._iconEls = null;
     this._ixEls = null;
+    // Tracks the applied urgency tier so we only touch classList when it
+    // actually changes. Re-adding the class every tick restarts the CSS
+    // pulse/glow animations, making them stutter once per second.
+    this._urgency = null;
   }
 
   initialize() {
@@ -110,7 +114,8 @@ export class PacerOverlay {
 
     if (state.gmSignal === GM_SIGNAL.SOFT) {
       this._element.classList.add('active', 'soft-signal');
-      this._element.classList.remove('countdown-signal', 'floor-open-signal', 'urgency-warning', 'urgency-critical');
+      this._element.classList.remove('countdown-signal', 'floor-open-signal');
+      this._setUrgency(null);
 
       iconEls.forEach(el => el.className = 'fa-solid fa-triangle-exclamation');
       messageEls.forEach(el => el.textContent = game.i18n.localize('STREAM_PACER.SoftSignalMessage'));
@@ -118,7 +123,8 @@ export class PacerOverlay {
       ixEls.forEach(el => el.textContent = game.i18n.format('STREAM_PACER.TickerIndex', { n: '01' }));
     } else if (state.gmSignal === GM_SIGNAL.FLOOR_OPEN) {
       this._element.classList.add('active', 'floor-open-signal');
-      this._element.classList.remove('soft-signal', 'countdown-signal', 'urgency-warning', 'urgency-critical');
+      this._element.classList.remove('soft-signal', 'countdown-signal');
+      this._setUrgency(null);
 
       iconEls.forEach(el => el.className = 'fa-solid fa-microphone');
       messageEls.forEach(el => el.textContent = game.i18n.localize('STREAM_PACER.FloorOpenMessage'));
@@ -138,16 +144,27 @@ export class PacerOverlay {
         const seconds = remaining % 60;
         countdownEls.forEach(el => el.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`);
 
-        this._element.classList.remove('urgency-warning', 'urgency-critical');
-        if (remaining <= 10) {
-          this._element.classList.add('urgency-critical');
-        } else if (remaining <= 30) {
-          this._element.classList.add('urgency-warning');
-        }
+        const urgency = remaining <= 10 ? 'critical' : remaining <= 30 ? 'warning' : null;
+        this._setUrgency(urgency);
       }
     } else {
-      this._element.classList.remove('active', 'soft-signal', 'countdown-signal', 'floor-open-signal', 'urgency-warning', 'urgency-critical');
+      this._element.classList.remove('active', 'soft-signal', 'countdown-signal', 'floor-open-signal');
+      this._setUrgency(null);
     }
+  }
+
+  // Applies the urgency tier without restarting the CSS animation when the
+  // tier is unchanged. Only the actual transition between tiers touches the
+  // classList, so the pulse/glow keeps a continuous cycle while counting down.
+  _setUrgency(urgency) {
+    if (urgency === this._urgency) return;
+    this._element.classList.remove('urgency-warning', 'urgency-critical');
+    if (urgency === 'critical') {
+      this._element.classList.add('urgency-critical');
+    } else if (urgency === 'warning') {
+      this._element.classList.add('urgency-warning');
+    }
+    this._urgency = urgency;
   }
 
   destroy() {
