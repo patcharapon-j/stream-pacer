@@ -9,6 +9,10 @@
 <div class="pk-sweep" aria-hidden="true"></div>
 <div class="pk-shock" aria-hidden="true"></div>
 
+<div class="pk-preflash" aria-hidden="true">
+  {{#each flashLetters}}<span class="pk-pf" style="--i:{{this.i}}">{{this.ch}}</span>{{/each}}
+</div>
+
 <div class="pk-frame" aria-hidden="true">
   <span class="pk-corner pk-tl"></span>
   <span class="pk-corner pk-tr"></span>

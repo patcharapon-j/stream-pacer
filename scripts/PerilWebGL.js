@@ -111,8 +111,8 @@ void main(){
   float ring = smoothstep(0.10, 0.0, abs(dist - ringR));
   col += (u_hot + u_mid) * ring * (1.0 - clamp(u_burst, 0.0, 1.0)) * 1.6;
 
-  // Secondary slam ring synced to the title impact (~1.2s in).
-  float t2 = clamp((t - 1.2) / 0.6, 0.0, 1.5);
+  // Secondary slam ring synced to the title impact (~1.55s in).
+  float t2 = clamp((t - 1.55) / 0.6, 0.0, 1.5);
   float ring2R = t2 * 1.25;
   float ring2 = smoothstep(0.08, 0.0, abs(dist - ring2R));
   col += (u_hot + u_mid) * ring2 * (1.0 - clamp(t2, 0.0, 1.0)) * 1.3;

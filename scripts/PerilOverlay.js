@@ -127,6 +127,11 @@ export class PerilOverlay {
     const direLetters = toLetters(text.dire);
     const perilLetters = toLetters(text.peril);
 
+    // Big center flash montage — every character (spaces dropped) in order.
+    const flashLetters = Array.from(`${text.dire}${text.peril}`)
+      .filter((ch) => ch !== ' ')
+      .map((ch, i) => ({ ch, i }));
+
     const context = {
       tag: text.tag,
       subtitle: text.subtitle,
@@ -135,6 +140,8 @@ export class PerilOverlay {
       perilLetters,
       direCount: direLetters.length,
       perilCount: perilLetters.length,
+      flashLetters,
+      flashCount: flashLetters.length,
       runTop: game.i18n.localize('STREAM_PACER.DirePerilRunTop'),
       runBottom: game.i18n.localize('STREAM_PACER.DirePerilRunBottom')
     };

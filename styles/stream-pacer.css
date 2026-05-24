@@ -1520,9 +1520,40 @@
   100% { transform: translate(-50%, -50%) rotate(160deg); }
 }
 
+/* Pre-flash montage — each character stamps huge at center in rapid
+   sequence before the full title assembles. */
+.stream-pacer-peril-stage .pk-preflash {
+  position: absolute;
+  inset: 0;
+  z-index: 36;
+  pointer-events: none;
+}
+.stream-pacer-peril-stage .pk-pf {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1;
+  font-size: clamp(180px, 32vw, 460px);
+  color: #fff;
+  text-shadow: 0 0 40px var(--sp-peril-glow), 0 0 90px var(--sp-peril-red-glow), 0 6px 16px #000;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(1.22);
+  animation: pk-pf 92ms cubic-bezier(0.6, 0, 0.1, 1) both;
+  animation-delay: calc(160ms + var(--i) * 78ms);
+}
+@keyframes pk-pf {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(1.22); filter: blur(3px); }
+  30% { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: blur(0); }
+  70% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.97); filter: blur(0); }
+}
+
 /* Title composition. Motion is sharp and snappy — no bounce: tight-eased
    micro-slides, rapid per-character opacity flashing, and letter-spacing
-   tracking that collapses each line into place, then a frozen pose hold. */
+   tracking that collapses each line into place, then a frozen pose hold.
+   The two lines assemble only after the pre-flash montage completes. */
 .stream-pacer-peril-stage .pk-stack {
   position: absolute;
   top: 50%;
@@ -1538,12 +1569,12 @@
 
 /* Single sharp positional jolt as the second line lands — no scale bounce. */
 @keyframes pk-jolt {
-  0%, 27% { transform: translate(-50%, -50%); }
-  28% { transform: translate(calc(-50% - 6px), -50%); }
-  29% { transform: translate(calc(-50% + 7px), calc(-50% - 2px)); }
-  30% { transform: translate(calc(-50% - 4px), calc(-50% + 2px)); }
-  31% { transform: translate(calc(-50% + 2px), -50%); }
-  32%, 100% { transform: translate(-50%, -50%); }
+  0%, 38% { transform: translate(-50%, -50%); }
+  39% { transform: translate(calc(-50% - 6px), -50%); }
+  40% { transform: translate(calc(-50% + 7px), calc(-50% - 2px)); }
+  41% { transform: translate(calc(-50% - 4px), calc(-50% + 2px)); }
+  42% { transform: translate(calc(-50% + 2px), -50%); }
+  43%, 100% { transform: translate(-50%, -50%); }
 }
 
 .stream-pacer-peril-stage .pk-tag {
@@ -1562,10 +1593,10 @@
   animation: pk-tag 4200ms cubic-bezier(0.7, 0, 0.1, 1) forwards;
 }
 @keyframes pk-tag {
-  0%, 7% { opacity: 0; transform: scaleX(0.1); }
-  12% { opacity: 1; transform: scaleX(1); }
-  13.5% { opacity: 0.35; }
-  15% { opacity: 1; }
+  0%, 17% { opacity: 0; transform: scaleX(0.1); }
+  22% { opacity: 1; transform: scaleX(1); }
+  23.5% { opacity: 0.35; }
+  25% { opacity: 1; }
   82% { opacity: 1; transform: scaleX(1); }
   100% { opacity: 0; }
 }
@@ -1589,28 +1620,28 @@
   animation: pk-track-2 4200ms cubic-bezier(0.7, 0, 0.1, 1) both, pk-strobe-2 4200ms steps(1) both;
 }
 @keyframes pk-track-1 {
-  0%, 9% { letter-spacing: 0.55em; }
-  25% { letter-spacing: 0.04em; }
+  0%, 20% { letter-spacing: 0.55em; }
+  30% { letter-spacing: 0.04em; }
   100% { letter-spacing: 0.04em; }
 }
 @keyframes pk-track-2 {
-  0%, 18% { letter-spacing: 0.55em; }
-  33% { letter-spacing: 0.04em; }
+  0%, 30% { letter-spacing: 0.55em; }
+  41% { letter-spacing: 0.04em; }
   100% { letter-spacing: 0.04em; }
 }
 @keyframes pk-strobe-1 {
-  0%, 17% { filter: none; }
-  18% { filter: brightness(2.4); }
-  19% { filter: none; }
-  20% { filter: brightness(1.7); }
-  21%, 100% { filter: none; }
+  0%, 28% { filter: none; }
+  29% { filter: brightness(2.4); }
+  30% { filter: none; }
+  31% { filter: brightness(1.7); }
+  32%, 100% { filter: none; }
 }
 @keyframes pk-strobe-2 {
-  0%, 27% { filter: none; }
-  28% { filter: brightness(2.6); }
-  29% { filter: none; }
-  30% { filter: brightness(1.8); }
-  31%, 100% { filter: none; }
+  0%, 38% { filter: none; }
+  39% { filter: brightness(2.6); }
+  40% { filter: none; }
+  41% { filter: brightness(1.8); }
+  42%, 100% { filter: none; }
 }
 
 .stream-pacer-peril-stage .pk-l {
@@ -1624,7 +1655,7 @@
 /* Line 1 — sharp downward micro-slide + rapid opacity flash. */
 .stream-pacer-peril-stage .pk-line-1 .pk-l {
   animation: pk-char-y 240ms cubic-bezier(0.7, 0, 0.1, 1) both;
-  animation-delay: calc(460ms + var(--i) * 30ms);
+  animation-delay: calc(900ms + var(--i) * 30ms);
 }
 @keyframes pk-char-y {
   0% { opacity: 0; transform: translateY(-0.16em); filter: blur(5px); }
@@ -1638,7 +1669,7 @@
 /* Line 2 — sharp sideways micro-slide + flash, heavier RGB-split shadow. */
 .stream-pacer-peril-stage .pk-line-2 .pk-l {
   animation: pk-char-x 250ms cubic-bezier(0.7, 0, 0.1, 1) both;
-  animation-delay: calc(820ms + var(--i) * 30ms);
+  animation-delay: calc(1280ms + var(--i) * 30ms);
   text-shadow:
     -3px 0 var(--sp-peril-red),
     2px 0 var(--sp-peril-ghost),
@@ -1664,9 +1695,8 @@
   animation: pk-rule 4200ms cubic-bezier(0.7, 0, 0.15, 1) forwards;
 }
 @keyframes pk-rule {
-  0%, 19% { width: 0; opacity: 0; }
-  23% { width: min(500px, 66vw); opacity: 1; }
-  26% { width: min(440px, 60vw); opacity: 1; }
+  0%, 39% { width: 0; opacity: 0; }
+  43% { width: min(440px, 60vw); opacity: 1; }
   82% { width: min(440px, 60vw); opacity: 1; }
   100% { width: min(440px, 60vw); opacity: 0; }
 }
@@ -1684,8 +1714,8 @@
   animation: pk-sub 4200ms steps(24) forwards;
 }
 @keyframes pk-sub {
-  0%, 33% { max-width: 0; }
-  44% { max-width: 620px; }
+  0%, 46% { max-width: 0; }
+  56% { max-width: 620px; }
   82% { max-width: 620px; }
   100% { max-width: 0; }
 }
@@ -1704,9 +1734,9 @@
   0%, 3% { opacity: 0; }
   3.5% { opacity: 0.85; }
   6% { opacity: 0; }
-  28% { opacity: 0; }
-  29% { opacity: 0.95; }
-  31% { opacity: 0; }
+  38% { opacity: 0; }
+  39% { opacity: 0.95; }
+  41% { opacity: 0; }
   100% { opacity: 0; }
 }
 
