@@ -55,6 +55,8 @@ The Stream Pacer HUD appears on screen, allowing you to:
 | Default Countdown Duration | Duration for countdown timer (1-10 minutes) |
 | Reset on Scene Change | Automatically reset statuses when scene changes |
 | Exempt Users | Users who won't see the Stream Pacer UI |
+| Appearance / Tech Display | Pick a color preset (Arknights Amber, Endfield Blue, Crimson Protocol, Void Violet, Verdant Ops) or set custom accent/peril colors. Re-themes the whole HUD and the Dire Peril screen. |
+| Dire Peril WebGL Effect | Toggle the cinematic WebGL danger field on the Dire Peril reveal (disable on low-end machines). |
 
 ## API
 

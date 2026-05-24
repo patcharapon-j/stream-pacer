@@ -1265,6 +1265,25 @@
    Plays once (4200ms) then hands off to the corner indicator.
    ======================================== */
 
+/* WebGL danger field — sits just below the kinetic-typography stage so the
+   translucent wash and lettering composite on top of it. */
+.stream-pacer-peril-webgl {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 9998;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.18s ease-in;
+  will-change: opacity;
+}
+
+.stream-pacer-peril-webgl.visible {
+  opacity: 1;
+  transition: opacity 0.65s ease-out;
+}
+
 .stream-pacer-peril-stage {
   position: fixed;
   inset: 0;
@@ -2394,4 +2413,84 @@
     animation: none !important;
     transition: none !important;
   }
+
+  /* WebGL field never renders under reduced motion. */
+  .stream-pacer-peril-webgl {
+    display: none !important;
+  }
+}
+
+/* ========================================
+   Appearance / Tech Display config
+   ======================================== */
+
+.stream-pacer-appearance .sp-appearance {
+  padding: 4px 2px;
+}
+
+.stream-pacer-appearance .sp-appearance-note {
+  margin: 0 0 10px;
+  font-size: 12px;
+  color: var(--sp-muted-2, #8a96a4);
+}
+
+.stream-pacer-appearance .form-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.stream-pacer-appearance .form-group > label {
+  flex: 1;
+  font-weight: 600;
+}
+
+.stream-pacer-appearance .sp-preset-select {
+  flex: 1.2;
+}
+
+.stream-pacer-appearance .sp-swatch-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 6px 0 4px;
+}
+
+.stream-pacer-appearance .sp-swatch {
+  display: inline-flex;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.stream-pacer-appearance .sp-swatch i {
+  display: block;
+  width: 22px;
+  height: 16px;
+}
+
+.stream-pacer-appearance .sp-color-group input[type="color"] {
+  width: 60px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  cursor: pointer;
+}
+
+.stream-pacer-appearance .sp-toggle-group {
+  flex-wrap: wrap;
+}
+
+.stream-pacer-appearance .sp-toggle-group .notes {
+  flex-basis: 100%;
+  margin: 4px 0 0;
+  font-size: 11px;
+  color: var(--sp-muted, #6a7684);
+}
+
+.stream-pacer-appearance .sp-appearance-footer {
+  margin-top: 14px;
+  text-align: right;
 }

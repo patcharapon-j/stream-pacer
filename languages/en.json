@@ -77,7 +77,26 @@
       "HandRaiseAudioEnabled": "Hand Raise Audio Notification",
       "HandRaiseAudioEnabledHint": "Play a chime sound when a player raises their hand (GM only)",
       "HandRaiseAudioVolume": "Hand Raise Audio Volume",
-      "HandRaiseAudioVolumeHint": "Volume level for the hand raise notification chime (0 = mute, 1 = full volume)"
+      "HandRaiseAudioVolumeHint": "Volume level for the hand raise notification chime (0 = mute, 1 = full volume)",
+
+      "Appearance": "Appearance / Tech Display",
+      "AppearanceLabel": "Customize Tech Display",
+      "AppearanceHint": "Choose a color theme and effect settings for the Stream Pacer HUD and the Dire Peril screen",
+      "AppearanceIntro": "Pick a preset tech-display palette, or choose Custom to set your own colors. This re-themes the HUD, status indicators, signals, and the Dire Peril reveal.",
+      "ThemePreset": "Theme Preset",
+      "CustomColorsHint": "Custom colors apply only when the 'Custom' preset is selected above.",
+      "AccentColor": "Accent Color",
+      "PerilColor": "Dire Peril Color",
+      "PerilWebGL": "Dire Peril WebGL Effect",
+      "PerilWebGLHint": "Render the cinematic WebGL danger field during the Dire Peril reveal. Disable on low-end machines.",
+      "Preset": {
+        "arknights-amber": "Arknights Amber",
+        "endfield-blue": "Endfield Blue",
+        "crimson-protocol": "Crimson Protocol",
+        "void-violet": "Void Violet",
+        "verdant-ops": "Verdant Ops",
+        "custom": "Custom"
+      }
     }
   }
 }

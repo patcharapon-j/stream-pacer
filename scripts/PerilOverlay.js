@@ -1,5 +1,6 @@
 import { MODULE_ID } from './settings.js';
 import { PacerManager } from './PacerManager.js';
+import { PerilWebGL } from './PerilWebGL.js';
 
 const STAGE_TEMPLATE = `modules/${MODULE_ID}/templates/peril-stage.hbs`;
 const INDICATOR_TEMPLATE = `modules/${MODULE_ID}/templates/peril-indicator.hbs`;
@@ -22,9 +23,20 @@ export class PerilOverlay {
     this._stageTimer = null;
     this._indicatorTimer = null;
     this._unsubscribe = null;
+    this._webgl = new PerilWebGL();
     // Incremented whenever peril becomes inactive; in-flight async renders
     // check this token before writing DOM so a dismiss can cancel them.
     this._activationToken = 0;
+  }
+
+  /** WebGL backdrop runs unless disabled in settings or reduced-motion is on. */
+  _webglEnabled() {
+    try {
+      if (!game.settings.get(MODULE_ID, 'perilWebGLEnabled')) return false;
+    } catch (e) {
+      /* setting not ready — default to on */
+    }
+    return !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 
   initialize() {
@@ -71,6 +83,7 @@ export class PerilOverlay {
 
   async _playStageAndShowIndicator() {
     const token = ++this._activationToken;
+    if (this._webglEnabled()) this._webgl.play(STAGE_DURATION_MS);
     await this._renderStage(token);
     if (token !== this._activationToken) return;
     this._scheduleHandoff(token);
@@ -151,6 +164,7 @@ export class PerilOverlay {
     this._activationToken++;
     clearTimeout(this._indicatorTimer);
     clearTimeout(this._stageTimer);
+    this._webgl.stop();
     this._unmountStage();
     if (!this._indicatorEl) return;
     this._indicatorEl.classList.remove('visible');
@@ -162,6 +176,10 @@ export class PerilOverlay {
   destroy() {
     clearTimeout(this._stageTimer);
     clearTimeout(this._indicatorTimer);
+    if (this._webgl) {
+      this._webgl.destroy();
+      this._webgl = null;
+    }
     if (this._unsubscribe) {
       this._unsubscribe();
       this._unsubscribe = null;
