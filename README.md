@@ -33,6 +33,11 @@ https://github.com/patcharapon-j/stream-pacer/releases/latest/download/module.js
 2. Extract the `module.zip` to your `Data/modules/` folder
 3. Enable the module in your Foundry VTT world
 
+### Updating
+Once installed via the manifest URL, Foundry checks the same link for new
+releases and shows an **Update** button when one is available — no need to
+reinstall.
+
 ## Usage
 
 ### For Players
