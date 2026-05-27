@@ -214,11 +214,7 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
     `;
 
     const readMinutes = (root) => {
-      // v13 DialogV2 passes a native HTMLElement; legacy Dialog passes jQuery.
-      const el = root instanceof HTMLElement
-        ? root
-        : (root?.[0] ?? root);
-      const input = el?.querySelector?.('[name="minutes"]');
+      const input = root?.querySelector?.('[name="minutes"]');
       return parseInt(input?.value) || defaultMinutes || 1;
     };
 
@@ -227,47 +223,25 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
       PacerManager.startCountdown(seconds);
     };
 
-    // Prefer DialogV2 (v13+) and fall back to the legacy Dialog.
-    const DialogV2 = foundry.applications?.api?.DialogV2;
-    if (DialogV2) {
-      await DialogV2.wait({
-        window: { title: game.i18n.localize('STREAM_PACER.StartCountdown') },
-        content,
-        buttons: [
-          {
-            action: 'start',
-            label: game.i18n.localize('STREAM_PACER.Start'),
-            icon: 'fas fa-play',
-            default: true,
-            callback: (_event, _button, dialog) => start(readMinutes(dialog.element))
-          },
-          {
-            action: 'cancel',
-            label: game.i18n.localize('STREAM_PACER.Cancel'),
-            icon: 'fas fa-times'
-          }
-        ],
-        rejectClose: false
-      });
-      return;
-    }
-
-    new Dialog({
-      title: game.i18n.localize('STREAM_PACER.StartCountdown'),
+    await foundry.applications.api.DialogV2.wait({
+      window: { title: game.i18n.localize('STREAM_PACER.StartCountdown') },
       content,
-      buttons: {
-        start: {
-          icon: '<i class="fas fa-play"></i>',
+      buttons: [
+        {
+          action: 'start',
           label: game.i18n.localize('STREAM_PACER.Start'),
-          callback: (html) => start(readMinutes(html))
+          icon: 'fas fa-play',
+          default: true,
+          callback: (_event, _button, dialog) => start(readMinutes(dialog.element))
         },
-        cancel: {
-          icon: '<i class="fas fa-times"></i>',
-          label: game.i18n.localize('STREAM_PACER.Cancel')
+        {
+          action: 'cancel',
+          label: game.i18n.localize('STREAM_PACER.Cancel'),
+          icon: 'fas fa-times'
         }
-      },
-      default: 'start'
-    }).render(true);
+      ],
+      rejectClose: false
+    });
   }
 
   _onClose(options) {

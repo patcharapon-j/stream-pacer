@@ -1,6 +1,6 @@
 # Stream Pacer
 
-A communication tool for GMs and players to signal scene readiness and pacing during gameplay in Foundry VTT v13, optimized for streaming.
+A communication tool for GMs and players to signal scene readiness and pacing during gameplay in Foundry VTT v13–v14, optimized for streaming.
 
 ## Features
 
@@ -79,7 +79,7 @@ game.streamPacer.overlay
 
 ## Compatibility
 
-- **Foundry VTT**: v13+
+- **Foundry VTT**: v13–v14 (verified on v14)
 - **System**: System agnostic (works with any game system)
 
 ## License
