@@ -1,6 +1,6 @@
 # Stream Pacer
 
-A communication tool for GMs and players to signal scene readiness and pacing during gameplay in Foundry VTT v13, optimized for streaming.
+A communication tool for GMs and players to signal scene readiness and pacing during gameplay in Foundry VTT v13–v14, optimized for streaming.
 
 ## Features
 
@@ -32,6 +32,11 @@ https://github.com/patcharapon-j/stream-pacer/releases/latest/download/module.js
 1. Download the latest release from the [Releases](https://github.com/patcharapon-j/stream-pacer/releases) page
 2. Extract the `module.zip` to your `Data/modules/` folder
 3. Enable the module in your Foundry VTT world
+
+### Updating
+Once installed via the manifest URL, Foundry checks the same link for new
+releases and shows an **Update** button when one is available — no need to
+reinstall.
 
 ## Usage
 
@@ -79,7 +84,7 @@ game.streamPacer.overlay
 
 ## Compatibility
 
-- **Foundry VTT**: v13+
+- **Foundry VTT**: v13–v14 (verified on v14)
 - **System**: System agnostic (works with any game system)
 
 ## License

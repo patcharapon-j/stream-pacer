@@ -10,10 +10,8 @@ const STAGE_DURATION_MS = 4200;
 /** Offset (ms) before end at which the indicator appears. */
 const INDICATOR_LEAD_MS = 700;
 
-/** v13-safe template renderer — prefer namespaced API, fall back to global shim. */
 function renderHbs(path, ctx) {
-  const ns = foundry?.applications?.handlebars?.renderTemplate;
-  return ns ? ns(path, ctx) : renderTemplate(path, ctx);
+  return foundry.applications.handlebars.renderTemplate(path, ctx);
 }
 
 /** Read a world-scoped text setting, falling back to the localized default. */

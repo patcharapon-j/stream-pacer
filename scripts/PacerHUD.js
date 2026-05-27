@@ -17,6 +17,11 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
     this._positionRestored = false;
     this._currentLeft = null;
     this._currentTop = null;
+    // Tracks the structural state of the last full render and the applied
+    // urgency tier, so countdown ticks can update the timer in place instead
+    // of re-rendering (which would restart the panel's CSS animations).
+    this._lastSignature = null;
+    this._countdownUrgency = null;
   }
 
   static DEFAULT_OPTIONS = {
@@ -128,9 +133,14 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
     super._onFirstRender(context, options);
 
     // Subscribe to manager updates
-    this._unsubscribe = PacerManager.subscribe(() => {
-      // Only re-render if we're still open
-      if (this.rendered) {
+    this._unsubscribe = PacerManager.subscribe((state) => {
+      if (!this.rendered) return;
+      // During a countdown, only the remaining seconds change each tick. A full
+      // re-render replaces the DOM and restarts the panel's CSS animations, so
+      // update the timer in place when nothing structural has changed.
+      if (this._canUpdateInPlace(state)) {
+        this._updateCountdownInPlace(state);
+      } else {
         this.render(false);
       }
     });
@@ -150,6 +160,62 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
     } else {
       // Re-apply position after re-render
       this._reapplyPosition();
+    }
+
+    // Record what this full render represents so subsequent countdown ticks
+    // can decide whether an in-place update is sufficient.
+    this._lastSignature = this._structuralSignature(PacerManager.getState());
+    this._countdownUrgency = context?.countdownUrgency ?? null;
+  }
+
+  // A fingerprint of everything the template renders except the countdown
+  // seconds. If this is unchanged between updates, only the timer ticked.
+  _structuralSignature(state) {
+    const players = PacerManager.getAllPlayerStates();
+    const playerSig = Object.values(players)
+      .map(p => `${p.userId}:${p.status}`)
+      .sort()
+      .join('|');
+    return [
+      state.gmSignal,
+      state.direPerilActive,
+      state.handRaisedCount,
+      PacerManager.getPlayerStatus(game.user.id),
+      playerSig
+    ].join('#');
+  }
+
+  _canUpdateInPlace(state) {
+    return state.gmSignal === GM_SIGNAL.COUNTDOWN
+      && this._lastSignature !== null
+      && this._lastSignature === this._structuralSignature(state)
+      && !!this.element?.querySelector('.countdown-timer');
+  }
+
+  _updateCountdownInPlace(state) {
+    const root = this.element?.querySelector('#stream-pacer-container');
+    if (!root) {
+      this.render(false);
+      return;
+    }
+
+    const remaining = state.countdownRemaining;
+    const timerEl = root.querySelector('.countdown-timer');
+    if (timerEl && remaining !== null) {
+      const minutes = Math.floor(remaining / 60);
+      const seconds = remaining % 60;
+      timerEl.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    // Swap urgency tier only when it actually changes, so the escalation
+    // animation isn't restarted on every tick within the same tier.
+    const urgency = remaining === null
+      ? 'normal'
+      : remaining <= 10 ? 'critical' : remaining <= 30 ? 'warning' : 'normal';
+    if (urgency !== this._countdownUrgency) {
+      root.classList.remove('urgency-normal', 'urgency-warning', 'urgency-critical');
+      root.classList.add(`urgency-${urgency}`);
+      this._countdownUrgency = urgency;
     }
   }
 
@@ -214,11 +280,7 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
     `;
 
     const readMinutes = (root) => {
-      // v13 DialogV2 passes a native HTMLElement; legacy Dialog passes jQuery.
-      const el = root instanceof HTMLElement
-        ? root
-        : (root?.[0] ?? root);
-      const input = el?.querySelector?.('[name="minutes"]');
+      const input = root?.querySelector?.('[name="minutes"]');
       return parseInt(input?.value) || defaultMinutes || 1;
     };
 
@@ -227,47 +289,25 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
       PacerManager.startCountdown(seconds);
     };
 
-    // Prefer DialogV2 (v13+) and fall back to the legacy Dialog.
-    const DialogV2 = foundry.applications?.api?.DialogV2;
-    if (DialogV2) {
-      await DialogV2.wait({
-        window: { title: game.i18n.localize('STREAM_PACER.StartCountdown') },
-        content,
-        buttons: [
-          {
-            action: 'start',
-            label: game.i18n.localize('STREAM_PACER.Start'),
-            icon: 'fas fa-play',
-            default: true,
-            callback: (_event, _button, dialog) => start(readMinutes(dialog.element))
-          },
-          {
-            action: 'cancel',
-            label: game.i18n.localize('STREAM_PACER.Cancel'),
-            icon: 'fas fa-times'
-          }
-        ],
-        rejectClose: false
-      });
-      return;
-    }
-
-    new Dialog({
-      title: game.i18n.localize('STREAM_PACER.StartCountdown'),
+    await foundry.applications.api.DialogV2.wait({
+      window: { title: game.i18n.localize('STREAM_PACER.StartCountdown') },
       content,
-      buttons: {
-        start: {
-          icon: '<i class="fas fa-play"></i>',
+      buttons: [
+        {
+          action: 'start',
           label: game.i18n.localize('STREAM_PACER.Start'),
-          callback: (html) => start(readMinutes(html))
+          icon: 'fas fa-play',
+          default: true,
+          callback: (_event, _button, dialog) => start(readMinutes(dialog.element))
         },
-        cancel: {
-          icon: '<i class="fas fa-times"></i>',
-          label: game.i18n.localize('STREAM_PACER.Cancel')
+        {
+          action: 'cancel',
+          label: game.i18n.localize('STREAM_PACER.Cancel'),
+          icon: 'fas fa-times'
         }
-      },
-      default: 'start'
-    }).render(true);
+      ],
+      rejectClose: false
+    });
   }
 
   _onClose(options) {
