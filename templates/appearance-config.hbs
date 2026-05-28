@@ -2,6 +2,17 @@
   <p class="sp-appearance-note">{{localize "STREAM_PACER.Settings.AppearanceIntro"}}</p>
 
   <div class="form-group">
+    <label>{{localize "STREAM_PACER.Settings.ThemeFamily"}}</label>
+    <select name="themeFamily" class="sp-preset-select">
+      {{#each families}}
+      <option value="{{this.key}}" {{#if this.selected}}selected{{/if}} title="{{this.hint}}">{{this.label}}</option>
+      {{/each}}
+    </select>
+  </div>
+
+  <p class="sp-appearance-note sp-appearance-subnote">{{localize "STREAM_PACER.Settings.ThemeFamilyHint"}}</p>
+
+  <div class="form-group">
     <label>{{localize "STREAM_PACER.Settings.ThemePreset"}}</label>
     <select name="themePreset" class="sp-preset-select">
       {{#each presets}}

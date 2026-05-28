@@ -3,13 +3,18 @@ import { MODULE_ID } from './settings.js';
 /**
  * Central appearance controller.
  *
- * Resolves the active "tech display" palette (a built-in preset or a fully
- * custom pair of colors) into a flat map of CSS custom properties, writes them
- * onto the document root so the entire Stream Pacer UI re-themes live, and
- * exposes the derived Dire Peril colors for the WebGL renderer.
+ * Resolves two layered choices into a single applied theme:
+ *   - Theme family (sci-fi | core | fantasy) selects the visual language:
+ *     fonts, shapes, decorations. Exposed to CSS via a [data-sp-family]
+ *     attribute on <html> and <body>.
+ *   - Color preset (or custom pair) sets the accent + peril hues. Resolved
+ *     into a flat map of CSS custom properties on :root so the whole UI
+ *     re-themes live.
+ *
+ * Also exposes the derived Dire Peril color bed for the WebGL renderer.
  */
 
-/** Built-in presets. Each entry resolves to { accent, peril } base hexes. */
+/** Built-in color presets. Names are family-neutral; each resolves to a base pair. */
 export const THEME_PRESETS = {
   'arknights-amber': { accent: '#e4b055', peril: '#d6184a' },
   'endfield-blue':   { accent: '#5ad1ff', peril: '#2f7bff' },
@@ -19,6 +24,9 @@ export const THEME_PRESETS = {
 };
 
 export const DEFAULT_PRESET = 'arknights-amber';
+
+export const THEME_FAMILIES = ['sci-fi', 'core', 'fantasy'];
+export const DEFAULT_FAMILY = 'core';
 
 function clamp8(n) {
   return Math.max(0, Math.min(255, Math.round(n)));
@@ -64,10 +72,13 @@ class ThemeManagerClass {
 
   /** Resolve the configured base colors, falling back gracefully. */
   _resolveBase() {
+    let family = DEFAULT_FAMILY;
     let preset = DEFAULT_PRESET;
     let accent = THEME_PRESETS[DEFAULT_PRESET].accent;
     let peril = THEME_PRESETS[DEFAULT_PRESET].peril;
     try {
+      const f = game.settings.get(MODULE_ID, 'themeFamily');
+      if (THEME_FAMILIES.includes(f)) family = f;
       preset = game.settings.get(MODULE_ID, 'themePreset') || DEFAULT_PRESET;
       if (preset === 'custom') {
         accent = game.settings.get(MODULE_ID, 'accentColor') || accent;
@@ -79,14 +90,16 @@ class ThemeManagerClass {
     } catch (e) {
       /* settings not ready — use defaults */
     }
-    return { preset, accent, peril };
+    return { family, preset, accent, peril };
   }
 
   /** Build the full CSS custom-property map from the two base colors. */
-  _buildPalette() {
-    const { accent, peril } = this._resolveBase();
-    const a = hexToRgb(accent);
-    const p = hexToRgb(peril);
+  _buildPalette(base) {
+    const a = hexToRgb(base.accent);
+    const p = hexToRgb(base.peril);
+
+    // Derived accent tones — softer dim, brighter glow.
+    const accentSoft = lighten(a, 0.18);
 
     // Derived peril tones — a deep near-black bed, a bright highlight, and a
     // hot "alert red" pushed toward saturated red-orange for the danger read.
@@ -97,6 +110,7 @@ class ThemeManagerClass {
 
     const vars = {
       '--sp-amber': rgbToHex(a),
+      '--sp-amber-soft': rgbToHex(accentSoft),
       '--sp-amber-dim': rgba(a, 0.22),
       '--sp-amber-glow': rgba(a, 0.4),
 
@@ -122,7 +136,8 @@ class ThemeManagerClass {
 
   /** Write the resolved palette onto :root via a managed <style> element. */
   apply() {
-    const vars = this._buildPalette();
+    const base = this._resolveBase();
+    const vars = this._buildPalette(base);
     const body = Object.entries(vars)
       .map(([k, v]) => `  ${k}: ${v};`)
       .join('\n');
@@ -134,12 +149,22 @@ class ThemeManagerClass {
       document.head.appendChild(this._styleEl);
     }
     this._styleEl.textContent = css;
+
+    // Stamp the family on root + body so CSS can branch off it.
+    const family = base.family;
+    document.documentElement.setAttribute('data-sp-family', family);
+    if (document.body) document.body.setAttribute('data-sp-family', family);
   }
 
   /** Normalized peril colors for the WebGL shader. */
   getPerilWebGLColors() {
-    if (!this._peril) this._buildPalette();
+    if (!this._peril) this._buildPalette(this._resolveBase());
     return this._peril;
+  }
+
+  /** Currently active family — convenience for any caller that needs it. */
+  getFamily() {
+    return this._resolveBase().family;
   }
 
   initialize() {

@@ -4,6 +4,7 @@ import { PacerManager } from './PacerManager.js';
 export class PacerOverlay {
   constructor() {
     this._element = null;
+    this._auraEl = null;
     this._contentEl = null;
     this._unsubscribe = null;
     this._resizeObserver = null;
@@ -36,6 +37,12 @@ export class PacerOverlay {
   }
 
   _createElement() {
+    // Aura sibling — sits directly above the ticker and fades upward. Lives as
+    // a sibling so it can extend past the ticker's overflow-hidden box.
+    this._auraEl = document.createElement('div');
+    this._auraEl.className = 'stream-pacer-bar-aura aura-bottom';
+    document.body.appendChild(this._auraEl);
+
     this._element = document.createElement('div');
     this._element.id = 'stream-pacer-overlay';
     this._element.className = 'stream-pacer-overlay';
@@ -56,6 +63,18 @@ export class PacerOverlay {
 
     // Initial segment creation
     this._adjustSegments();
+  }
+
+  /**
+   * Mirror a subset of the bar's classes onto the aura so the aura picks up
+   * signal tint + urgency without separate state plumbing.
+   */
+  _syncAura() {
+    if (!this._auraEl || !this._element) return;
+    const classes = ['active', 'soft-signal', 'countdown-signal', 'floor-open-signal', 'urgency-warning', 'urgency-critical'];
+    classes.forEach(c => {
+      this._auraEl.classList.toggle(c, this._element.classList.contains(c));
+    });
   }
 
   _adjustSegments() {
@@ -151,6 +170,8 @@ export class PacerOverlay {
       this._element.classList.remove('active', 'soft-signal', 'countdown-signal', 'floor-open-signal');
       this._setUrgency(null);
     }
+
+    this._syncAura();
   }
 
   // Applies the urgency tier without restarting the CSS animation when the
@@ -180,6 +201,10 @@ export class PacerOverlay {
       this._element.remove();
       this._element = null;
       this._contentEl = null;
+    }
+    if (this._auraEl) {
+      this._auraEl.remove();
+      this._auraEl = null;
     }
   }
 }
