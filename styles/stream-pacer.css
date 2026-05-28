@@ -2040,9 +2040,13 @@
   animation: sp-aura-breath 3.4s ease-in-out infinite;
 }
 
+/* Breath pulses brightness only — never opacity. Animating opacity here would
+   override the .active fade transition and desync the aura from the bar on
+   show/dismiss (the bar's sp-handbar-breath is brightness-only for the same
+   reason). The dim rest frame fakes the old opacity dip. */
 @keyframes sp-aura-breath {
-  0%, 100% { filter: brightness(1); opacity: 0.85; }
-  50%      { filter: brightness(1.15); opacity: 1; }
+  0%, 100% { filter: brightness(0.92); }
+  50%      { filter: brightness(1.12); }
 }
 
 /* Signal-colour mapping for the aura — mirrors the bar's signal classes. */
