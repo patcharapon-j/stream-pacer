@@ -1,4 +1,4 @@
-import { MODULE_ID, registerSettings } from './settings.js';
+import { MODULE_ID, registerSettings, migrateThemeFamily } from './settings.js';
 import { PacerManager } from './PacerManager.js';
 import { SocketHandler } from './socket-handler.js';
 import { PacerHUD } from './PacerHUD.js';
@@ -21,9 +21,13 @@ Hooks.once('init', () => {
   registerSettings();
 });
 
-Hooks.once('ready', () => {
+Hooks.once('ready', async () => {
   console.log(`${MODULE_ID} | Stream Pacer Ready`);
   isReady = true;
+
+  // One-time migration: preserve sci-fi for existing users; new installs land
+  // on the default family ('core'). Must run before the first paint.
+  await migrateThemeFamily();
 
   // Apply the user's chosen tech-display palette before any UI renders.
   ThemeManager.initialize();

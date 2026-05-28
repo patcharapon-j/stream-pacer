@@ -79,12 +79,14 @@
       "HandRaiseAudioVolume": "Hand Raise Audio Volume",
       "HandRaiseAudioVolumeHint": "Volume level for the hand raise notification chime (0 = mute, 1 = full volume)",
 
-      "Appearance": "Appearance / Tech Display",
-      "AppearanceLabel": "Customize Tech Display",
-      "AppearanceHint": "Choose a color theme and effect settings for the Stream Pacer HUD and the Dire Peril screen",
-      "AppearanceIntro": "Pick a preset tech-display palette, or choose Custom to set your own colors. This re-themes the HUD, status indicators, signals, and the Dire Peril reveal.",
-      "ThemePreset": "Theme Preset",
-      "CustomColorsHint": "Custom colors apply only when the 'Custom' preset is selected above.",
+      "Appearance": "Appearance",
+      "AppearanceLabel": "Customize Appearance",
+      "AppearanceHint": "Choose a theme family, color palette, and effect settings for the Stream Pacer HUD and the Dire Peril screen",
+      "AppearanceIntro": "Pick a theme family for the overall visual language, then a color palette to tint it. Custom unlocks free-form accent and peril colors.",
+      "ThemeFamily": "Theme Family",
+      "ThemeFamilyHint": "Family controls the visual language — fonts, shapes, and decoration style. The color palette below tints whichever family is active.",
+      "ThemePreset": "Color Palette",
+      "CustomColorsHint": "Custom colors apply only when the 'Custom' palette is selected above.",
       "AccentColor": "Accent Color",
       "PerilColor": "Dire Peril Color",
       "PerilWebGL": "Dire Peril WebGL Effect",
@@ -94,12 +96,22 @@
       "PerilTextPeril": "Title — Line 2",
       "PerilTextTag": "Hazard Tag",
       "PerilTextSubtitle": "Subtitle",
+      "Family": {
+        "sci-fi": "Sci-Fi — Operator Panel",
+        "core": "Core — Clean Modern",
+        "fantasy": "Fantasy — Arcane"
+      },
+      "FamilyHint": {
+        "sci-fi": "Beveled panels, scanline grain, tech monospace indices — the original Operator look.",
+        "core": "Flat panels, rounded corners, system fonts — sits cleanly inside Foundry's native chrome.",
+        "fantasy": "Ornamental brackets, serif display headers, filigree hairlines — dark gothic, polished."
+      },
       "Preset": {
-        "arknights-amber": "Arknights Amber",
-        "endfield-blue": "Endfield Blue",
-        "crimson-protocol": "Crimson Protocol",
-        "void-violet": "Void Violet",
-        "verdant-ops": "Verdant Ops",
+        "arknights-amber": "Amber",
+        "endfield-blue": "Azure",
+        "crimson-protocol": "Crimson",
+        "void-violet": "Violet",
+        "verdant-ops": "Verdant",
         "custom": "Custom"
       }
     }

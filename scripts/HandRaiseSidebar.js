@@ -10,6 +10,7 @@ import { PacerManager } from './PacerManager.js';
 export class HandRaiseSidebar {
   constructor() {
     this._element = null;
+    this._auraEl = null;
     this._contentEl = null;
     this._unsubscribe = null;
     this._isVisible = false;
@@ -38,6 +39,13 @@ export class HandRaiseSidebar {
    * Create the bar DOM structure - horizontal ticker at bottom
    */
   _createElement() {
+    // Aura sibling — sits directly below the hand-raise bar and fades downward.
+    // Lives outside the bar's overflow box so the gradient can extend ~3x the
+    // bar height. Always tinted with the hand-raise blue.
+    this._auraEl = document.createElement('div');
+    this._auraEl.className = 'stream-pacer-bar-aura aura-top hand-raise';
+    document.body.appendChild(this._auraEl);
+
     this._element = document.createElement('div');
     this._element.id = 'stream-pacer-hand-bar';
     this._element.className = 'stream-pacer-hand-bar';
@@ -130,7 +138,8 @@ export class HandRaiseSidebar {
     if (!this._element) return;
     this._isVisible = true;
     this._element.classList.add('active');
-    
+    if (this._auraEl) this._auraEl.classList.add('active');
+
     // Notify the main overlay to adjust its position
     document.body.classList.add('hand-bar-visible');
   }
@@ -142,7 +151,8 @@ export class HandRaiseSidebar {
     if (!this._element) return;
     this._isVisible = false;
     this._element.classList.remove('active');
-    
+    if (this._auraEl) this._auraEl.classList.remove('active');
+
     // Notify the main overlay to reset its position
     document.body.classList.remove('hand-bar-visible');
   }
@@ -159,6 +169,10 @@ export class HandRaiseSidebar {
       this._element.remove();
       this._element = null;
       this._contentEl = null;
+    }
+    if (this._auraEl) {
+      this._auraEl.remove();
+      this._auraEl = null;
     }
     this._currentPlayers = [];
     document.body.classList.remove('hand-bar-visible');
