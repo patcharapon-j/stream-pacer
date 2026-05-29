@@ -1,9 +1,10 @@
-/* Stream Pacer — UI Redesign v1.2
-   Base module: Arknights "Operator Panel" — amber primary, clipped corners, grain overlay.
+/* Stream Pacer — UI Redesign v2 "Arcane Glass"
+   Floating HUD: frosted-glass panel, soft ambient glow, kinetic light sweep —
+   aesthetics & motion ported from the GLUniverse Clocks & Tracker module.
    Dire Peril: royal purple + red touch, kinetic-typography full-screen reveal.
 */
 
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@500;600;700&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap');
 
 :root {
   /* Ink — panel background tones */
@@ -13,15 +14,26 @@
   --sp-ink-3: #1e2530;
 
   /* Text */
-  --sp-text: #e8ecf0;
-  --sp-muted: #6a7684;
-  --sp-muted-2: #8a96a4;
+  --sp-text: #eef1f7;
+  --sp-muted: #69748c;
+  --sp-muted-2: #98a2b6;
 
   /* Lines */
   --sp-line: rgba(255, 255, 255, 0.06);
   --sp-line-strong: rgba(255, 255, 255, 0.10);
 
-  /* Primary accent — amber (engaged, soft signal, panel stripe) */
+  /* Arcane Glass chrome — frosted panel surfaces, edges & ambient glow */
+  --sp-glass-tint: #1a2233;       /* cool slate base for the panel gradient */
+  --sp-edge: rgba(255, 255, 255, 0.13);
+  --sp-hair: rgba(255, 255, 255, 0.08);
+  --sp-glow: rgba(120, 150, 225, 0.5);
+  --sp-glow-soft: rgba(120, 150, 225, 0.18);
+  --sp-clock-font: 'Oxanium', 'Segoe UI', system-ui, sans-serif;
+  /* Glass & spring easings */
+  --sp-ease-glass: cubic-bezier(0.4, 0, 0.2, 1);
+  --sp-ease-spring: cubic-bezier(0.34, 1.3, 0.4, 1);
+
+  /* Primary accent — amber (engaged, soft signal, indices) */
   --sp-amber: #e4b055;
   --sp-amber-dim: rgba(228, 176, 85, 0.22);
   --sp-amber-glow: rgba(228, 176, 85, 0.4);
@@ -87,97 +99,76 @@
   display: none !important;
 }
 
+/* ---- Arcane Glass panel ---- */
 #stream-pacer-container {
   position: relative;
-  width: 212px;
-  background: linear-gradient(180deg, var(--sp-ink-2) 0%, var(--sp-ink-1) 100%);
+  width: 202px;
   color: var(--sp-text);
-  font-family: 'Rajdhani', 'Signika', sans-serif;
-  font-size: 10px;
-  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
-  backdrop-filter: blur(6px);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 11px;
+  border-radius: 14px;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0) 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.20)),
+    linear-gradient(160deg, var(--sp-glass-tint), #080b11 64%);
+  border: 1px solid var(--sp-edge);
   box-shadow:
-    0 14px 40px rgba(0, 0, 0, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03),
-    inset 0 -20px 30px rgba(0, 0, 0, 0.4),
-    0 0 0 1px rgba(228, 176, 85, 0.1);
-  transition: box-shadow 0.3s ease;
-  animation: sp-panel-drift 14s ease-in-out infinite alternate;
+    0 22px 60px rgba(0, 0, 0, 0.6),
+    0 2px 0 rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -12px 28px rgba(0, 0, 0, 0.38),
+    0 0 40px var(--sp-glow-soft);
+  backdrop-filter: blur(16px) saturate(1.15);
+  transition: box-shadow 0.6s ease, border-color 0.6s ease;
 }
 
-/* Grain overlay — two layered repeating gradients */
+/* Ambient top glow */
 #stream-pacer-container::before {
   content: '';
   position: absolute;
   inset: 0;
-  background:
-    repeating-linear-gradient(0deg, transparent 0 2px, rgba(255, 255, 255, 0.012) 2px 3px),
-    repeating-linear-gradient(45deg, transparent 0 22px, rgba(255, 255, 255, 0.018) 22px 23px);
+  background: radial-gradient(70% 150% at 50% -50%, var(--sp-glow), transparent 66%);
+  opacity: 0.22;
   pointer-events: none;
   z-index: 1;
+  transition: opacity 1s ease, background 1s ease;
 }
 
-/* Top inner-highlight hairline */
-#stream-pacer-container::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 8px;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12) 30%, rgba(255, 255, 255, 0.12) 70%, transparent);
-  pointer-events: none;
-  z-index: 3;
-}
-
-/* Left accent stripe — inserted in template */
+/* Kinetic light sweep — repurposes the .sp-accent element */
 #stream-pacer-container .sp-accent {
   position: absolute;
   top: 0;
-  bottom: 8px;
+  bottom: 0;
   left: 0;
-  width: 2px;
-  background: linear-gradient(180deg, var(--sp-amber) 0%, rgba(228, 176, 85, 0.1) 100%);
-  box-shadow: 0 0 8px var(--sp-amber-glow);
-  z-index: 2;
+  width: 40%;
+  z-index: 4;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.14), transparent);
+  transform: translateX(-160%) skewX(-12deg);
+  opacity: 0;
+  animation: sp-sweep 7s var(--sp-ease-glass) infinite;
 }
 
-#stream-pacer-container .sp-accent::after {
-  content: '';
-  position: absolute;
-  top: 36px;
-  left: 2px;
-  width: 7px;
-  height: 1px;
-  background: var(--sp-amber);
-  box-shadow: 0 0 6px var(--sp-amber);
+@keyframes sp-sweep {
+  0% { transform: translateX(-160%) skewX(-12deg); opacity: 0; }
+  8% { opacity: 1; }
+  24% { transform: translateX(320%) skewX(-12deg); opacity: 0; }
+  100% { transform: translateX(320%) skewX(-12deg); opacity: 0; }
 }
 
-/* Signal-active and countdown urgency override the accent stripe color */
-#stream-pacer-container.signal-active .sp-accent {
-  background: linear-gradient(180deg, var(--sp-amber) 0%, var(--sp-amber) 50%, rgba(228, 176, 85, 0.3) 100%);
+/* Signal state recolors the ambient glow + edge; the band carries the detail */
+#stream-pacer-container.signal-active {
+  --sp-glow: var(--sp-amber-glow);
+  --sp-glow-soft: var(--sp-amber-dim);
+  border-color: rgba(228, 176, 85, 0.4);
 }
 
-#stream-pacer-container.countdown-active .sp-accent {
-  background: linear-gradient(180deg, var(--sp-red) 0%, rgba(239, 100, 100, 0.3) 100%);
-  box-shadow: 0 0 10px rgba(239, 100, 100, 0.45);
-}
-
-@keyframes sp-panel-drift {
-  0% {
-    box-shadow:
-      0 14px 40px rgba(0, 0, 0, 0.55),
-      inset 0 1px 0 rgba(255, 255, 255, 0.03),
-      inset 0 -20px 30px rgba(0, 0, 0, 0.4),
-      0 0 0 1px rgba(228, 176, 85, 0.08);
-  }
-  100% {
-    box-shadow:
-      0 14px 50px rgba(0, 0, 0, 0.6),
-      inset 0 1px 0 rgba(255, 255, 255, 0.04),
-      inset 0 -20px 34px rgba(0, 0, 0, 0.45),
-      0 0 0 1px rgba(228, 176, 85, 0.16);
-  }
+#stream-pacer-container.countdown-active {
+  --sp-glow: rgba(239, 100, 100, 0.5);
+  --sp-glow-soft: rgba(239, 100, 100, 0.2);
+  border-color: rgba(239, 100, 100, 0.45);
 }
 
 /* ========================================
@@ -187,60 +178,79 @@
 #stream-pacer-container .pacer-header {
   display: flex;
   align-items: center;
-  gap: 5px;
-  padding: 5px 9px 5px 12px;
-  border-bottom: 1px solid var(--sp-line);
+  gap: 7px;
+  padding: 7px 10px 6px 10px;
+  border-bottom: 1px solid var(--sp-hair);
   position: relative;
   z-index: 2;
 }
 
 #stream-pacer-container .drag-handle {
-  color: var(--sp-muted);
-  font-size: 8.5px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
   cursor: grab;
-  padding: 0 1px;
-  transition: color 0.2s ease;
+  padding: 2px 1px;
   flex-shrink: 0;
 }
 
-#stream-pacer-container .drag-handle:hover {
-  color: var(--sp-amber);
+#stream-pacer-container .drag-handle i {
+  width: 3px;
+  height: 3px;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.22);
+  transition: background 0.3s ease;
+}
+
+#stream-pacer-container .pacer-header:hover .drag-handle i {
+  background: rgba(255, 255, 255, 0.45);
 }
 
 #stream-pacer-container .drag-handle:active {
   cursor: grabbing;
 }
 
-#stream-pacer-container .p-ix {
-  font-family: 'JetBrains Mono', monospace;
-  color: var(--sp-amber);
-  font-size: 8.5px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
-  text-shadow: 0 0 6px var(--sp-amber-glow);
+/* Live pulse dot */
+#stream-pacer-container .sp-pulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 99px;
+  background: var(--sp-amber);
+  box-shadow: 0 0 9px var(--sp-amber-glow);
   flex-shrink: 0;
+  animation: sp-pulse-dot 2.6s ease-in-out infinite;
+}
+
+#stream-pacer-container.countdown-active .sp-pulse {
+  background: var(--sp-red);
+  box-shadow: 0 0 9px rgba(239, 100, 100, 0.6);
+}
+
+@keyframes sp-pulse-dot {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
 }
 
 #stream-pacer-container .pacer-title {
   flex: 1;
-  font-family: 'Rajdhani', sans-serif;
-  font-weight: 600;
-  font-size: 9px;
-  letter-spacing: 2px;
+  font-weight: 700;
+  font-size: 9.5px;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--sp-text);
+  text-shadow: 0 0 14px var(--sp-glow-soft);
+  white-space: nowrap;
 }
 
 #stream-pacer-container .gm-badge {
-  font-family: 'Rajdhani', sans-serif;
   font-size: 7.5px;
   font-weight: 700;
-  letter-spacing: 1.3px;
-  padding: 1px 5px;
-  background: linear-gradient(135deg, var(--sp-amber) 0%, #c0913a 100%);
-  color: var(--sp-ink-0);
-  clip-path: polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%);
-  box-shadow: 0 0 8px rgba(228, 176, 85, 0.3);
+  letter-spacing: 0.14em;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, var(--sp-amber-soft, #ecc173), var(--sp-amber) 100%);
+  color: #1a1205;
+  box-shadow: 0 0 10px var(--sp-amber-glow), inset 0 1px 0 rgba(255, 255, 255, 0.3);
   text-transform: uppercase;
   flex-shrink: 0;
 }
@@ -250,8 +260,8 @@
    ======================================== */
 
 #stream-pacer-container .p-sec {
-  padding: 5px 9px 7px 12px;
-  border-bottom: 1px solid var(--sp-line);
+  padding: 6px 10px 8px 10px;
+  border-bottom: 1px solid var(--sp-hair);
   position: relative;
   z-index: 2;
 }
@@ -263,28 +273,27 @@
 #stream-pacer-container .p-lbl {
   display: flex;
   align-items: center;
-  gap: 5px;
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 8px;
-  font-weight: 600;
-  letter-spacing: 1.6px;
-  color: var(--sp-muted-2);
+  gap: 6px;
+  font-size: 7.5px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  color: var(--sp-muted);
   text-transform: uppercase;
-  margin-bottom: 4px;
+  margin-bottom: 5px;
 }
 
 #stream-pacer-container .p-lbl .num {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--sp-clock-font);
   color: var(--sp-amber);
   font-size: 7.5px;
-  letter-spacing: 0;
-  text-shadow: 0 0 4px rgba(228, 176, 85, 0.3);
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 6px var(--sp-amber-glow);
 }
 
 #stream-pacer-container .p-lbl .rule {
   flex: 1;
   height: 1px;
-  background: linear-gradient(90deg, var(--sp-line-strong), transparent);
+  background: linear-gradient(90deg, var(--sp-hair), transparent);
 }
 
 /* ========================================
@@ -294,35 +303,37 @@
 #stream-pacer-container .pacer-players {
   display: flex;
   flex-wrap: wrap;
-  gap: 2px;
+  gap: 4px;
 }
 
 #stream-pacer-container .player-status {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 1px 5px 1px 4px;
-  background: rgba(255, 255, 255, 0.025);
-  border-left: 2px solid var(--sp-muted);
-  font-family: 'Rajdhani', sans-serif;
+  gap: 5px;
+  padding: 2px 8px 2px 7px;
+  border-radius: 7px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.015));
+  border: 1px solid var(--sp-hair);
+  border-left: 2px solid var(--sp-muted-2);
   font-size: 9.5px;
-  font-weight: 500;
-  letter-spacing: 0.3px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
   color: var(--sp-text);
-  transition: all 0.25s cubic-bezier(0.2, 0.7, 0.3, 1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition: all 0.25s var(--sp-ease-spring);
   position: relative;
   overflow: hidden;
 }
 
 #stream-pacer-container .player-status i {
-  font-size: 7.5px;
+  font-size: 8px;
   width: 9px;
   text-align: center;
   flex-shrink: 0;
 }
 
 #stream-pacer-container .player-name {
-  max-width: 56px;
+  max-width: 60px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -331,7 +342,7 @@
 /* Engaged — amber */
 #stream-pacer-container .player-status.status-engaged {
   border-left-color: var(--sp-amber);
-  background: rgba(228, 176, 85, 0.05);
+  background: linear-gradient(180deg, rgba(228, 176, 85, 0.12), rgba(228, 176, 85, 0.02));
 }
 #stream-pacer-container .player-status.status-engaged i {
   color: var(--sp-amber);
@@ -340,7 +351,7 @@
 /* Ready — green */
 #stream-pacer-container .player-status.status-ready {
   border-left-color: var(--sp-green);
-  background: rgba(100, 192, 143, 0.08);
+  background: linear-gradient(180deg, rgba(100, 192, 143, 0.14), rgba(100, 192, 143, 0.03));
 }
 #stream-pacer-container .player-status.status-ready i {
   color: var(--sp-green);
@@ -349,7 +360,7 @@
 /* Need Time — purple (soft lavender) */
 #stream-pacer-container .player-status.status-need-time {
   border-left-color: var(--sp-purple);
-  background: rgba(166, 132, 255, 0.08);
+  background: linear-gradient(180deg, rgba(166, 132, 255, 0.14), rgba(166, 132, 255, 0.03));
 }
 #stream-pacer-container .player-status.status-need-time i {
   color: var(--sp-purple);
@@ -358,11 +369,10 @@
 /* Hand Raised — blue with glow + shimmer sweep */
 #stream-pacer-container .player-status.status-hand-raised {
   border-left-color: var(--sp-blue);
-  background: linear-gradient(135deg, rgba(90, 163, 240, 0.25) 0%, rgba(90, 163, 240, 0.08) 100%);
+  background: linear-gradient(135deg, rgba(90, 163, 240, 0.28) 0%, rgba(90, 163, 240, 0.08) 100%);
   box-shadow:
     0 0 14px rgba(90, 163, 240, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
   animation: sp-hand-pulse 1.6s ease-in-out infinite;
 }
 
@@ -387,22 +397,19 @@
   color: var(--sp-muted-2);
   font-style: italic;
   font-size: 8.5px;
-  font-family: 'Rajdhani', sans-serif;
 }
 
 @keyframes sp-hand-pulse {
   0%, 100% {
     box-shadow:
       0 0 14px rgba(90, 163, 240, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
   }
   50% {
     box-shadow:
       0 0 22px rgba(90, 163, 240, 0.65),
       0 0 40px rgba(90, 163, 240, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.25),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+      inset 0 1px 0 rgba(255, 255, 255, 0.25);
   }
 }
 
@@ -418,29 +425,187 @@
 
 /* ========================================
    Status buttons (player) + GM buttons
-   Shared styling — only active-state colors differ.
+   Shared glass styling — only active-state colors differ.
    ======================================== */
 
 #stream-pacer-container .status-buttons {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 2px;
+  gap: 4px;
+}
+
+#stream-pacer-container .pacer-gm-controls {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
+}
+
+#stream-pacer-container .status-btn,
+#stream-pacer-container .gm-btn {
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
+  border: 1px solid var(--sp-hair);
+  border-radius: 8px;
+  color: var(--sp-muted-2);
+  font-size: 11px;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.1s var(--sp-ease-spring);
+  position: relative;
+}
+
+#stream-pacer-container .status-btn span,
+#stream-pacer-container .gm-btn span {
+  display: none;
+}
+
+#stream-pacer-container .status-btn:hover,
+#stream-pacer-container .gm-btn:hover {
+  color: var(--sp-text);
+  border-color: rgba(255, 255, 255, 0.22);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.02));
+  box-shadow: 0 0 12px var(--sp-glow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transform: translateY(-1px);
+}
+
+#stream-pacer-container .status-btn:active,
+#stream-pacer-container .gm-btn:active {
+  transform: translateY(0);
+  filter: brightness(0.92);
+}
+
+/* Hand-raised button — color-specific hover */
+#stream-pacer-container .status-btn.status-hand-raised:hover:not(.active) {
+  color: var(--sp-blue);
+  border-color: rgba(90, 163, 240, 0.5);
+  background: rgba(90, 163, 240, 0.1);
+  box-shadow: 0 0 10px rgba(90, 163, 240, 0.3);
+}
+
+/* Active states — status buttons */
+#stream-pacer-container .status-btn.status-engaged.active {
+  color: var(--sp-amber);
+  border-color: var(--sp-amber);
+  background: linear-gradient(180deg, rgba(228, 176, 85, 0.2), rgba(228, 176, 85, 0.06));
+  box-shadow: 0 0 12px rgba(228, 176, 85, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+#stream-pacer-container .status-btn.status-hand-raised.active {
+  color: var(--sp-blue);
+  border-color: var(--sp-blue);
+  background: linear-gradient(135deg, rgba(90, 163, 240, 0.22), rgba(90, 163, 240, 0.08));
+  box-shadow:
+    0 0 15px rgba(90, 163, 240, 0.5),
+    0 0 30px rgba(90, 163, 240, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  animation: sp-hand-btn-pulse 1.6s ease-in-out infinite;
+  overflow: hidden;
+}
+
+#stream-pacer-container .status-btn.status-hand-raised.active::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+  animation: sp-shimmer-sweep 2s ease-in-out infinite;
+}
+
+#stream-pacer-container .status-btn.status-hand-raised.active i {
+  filter: drop-shadow(0 0 4px rgba(90, 163, 240, 0.8));
+}
+
+#stream-pacer-container .status-btn.status-ready.active {
+  color: var(--sp-green);
+  border-color: var(--sp-green);
+  background: linear-gradient(180deg, rgba(100, 192, 143, 0.2), rgba(100, 192, 143, 0.06));
+  box-shadow: 0 0 12px rgba(100, 192, 143, 0.35);
+}
+
+#stream-pacer-container .status-btn.status-need-time.active {
+  color: var(--sp-purple);
+  border-color: var(--sp-purple);
+  background: linear-gradient(180deg, rgba(166, 132, 255, 0.2), rgba(166, 132, 255, 0.06));
+  box-shadow: 0 0 12px rgba(166, 132, 255, 0.35);
+}
+
+/* Active states — GM buttons */
+#stream-pacer-container .gm-btn.soft-signal-btn:hover,
+#stream-pacer-container .gm-btn.soft-signal-btn.active {
+  color: var(--sp-amber);
+  border-color: var(--sp-amber);
+  background: linear-gradient(180deg, rgba(228, 176, 85, 0.2), rgba(228, 176, 85, 0.06));
+  box-shadow: 0 0 12px rgba(228, 176, 85, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+#stream-pacer-container .gm-btn.soft-signal-btn.active {
+  animation: sp-btn-pulse-amber 2.4s ease-in-out infinite;
+}
+
+#stream-pacer-container .gm-btn.countdown-btn:hover,
+#stream-pacer-container .gm-btn.countdown-btn.active {
+  color: var(--sp-red);
+  border-color: var(--sp-red);
+  background: linear-gradient(180deg, rgba(239, 100, 100, 0.2), rgba(239, 100, 100, 0.06));
+  box-shadow: 0 0 12px rgba(239, 100, 100, 0.35);
+}
+
+#stream-pacer-container .gm-btn.floor-open-btn:hover,
+#stream-pacer-container .gm-btn.floor-open-btn.active {
+  color: var(--sp-cyan);
+  border-color: var(--sp-cyan);
+  background: linear-gradient(180deg, rgba(71, 200, 255, 0.2), rgba(71, 200, 255, 0.06));
+  box-shadow: 0 0 12px rgba(71, 200, 255, 0.35);
+}
+
+#stream-pacer-container .gm-btn.cancel-btn:hover {
+  color: var(--sp-red);
+  border-color: var(--sp-red);
+}
+
+@keyframes sp-hand-btn-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 15px rgba(90, 163, 240, 0.5),
+      0 0 30px rgba(90, 163, 240, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow:
+      0 0 20px rgba(90, 163, 240, 0.7),
+      0 0 40px rgba(90, 163, 240, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+}
+
+@keyframes sp-btn-pulse-amber {
+  0%, 100% { box-shadow: 0 0 12px rgba(228, 176, 85, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1); }
+  50% { box-shadow: 0 0 18px rgba(228, 176, 85, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15); }
 }
 
 /* ========================================
    Active signal band
-   Appears when a signal is active; sits between operators and command
+   Appears when a signal is active; sits between operators and command.
    ======================================== */
 
 #stream-pacer-container .pacer-signal {
   display: flex;
   align-items: center;
-  gap: 7px;
-  padding: 5px 9px 5px 12px;
-  font-family: 'Rajdhani', sans-serif;
+  gap: 8px;
+  padding: 6px 10px;
   font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 1.3px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   border-top: 1px solid var(--sp-amber-dim);
   border-bottom: 1px solid var(--sp-amber-dim);
@@ -453,17 +618,14 @@
 }
 
 #stream-pacer-container .pacer-signal i {
-  filter: drop-shadow(0 0 6px rgba(228, 176, 85, 0.6));
-  font-size: 10px;
-}
-
-#stream-pacer-container .pacer-signal.soft-signal {
-  /* already amber by default — no override needed */
+  filter: drop-shadow(0 0 6px var(--sp-amber-glow));
+  font-size: 11px;
+  flex-shrink: 0;
 }
 
 #stream-pacer-container .pacer-signal.floor-open-signal {
-  border-top-color: rgba(71, 200, 255, 0.25);
-  border-bottom-color: rgba(71, 200, 255, 0.25);
+  border-top-color: rgba(71, 200, 255, 0.28);
+  border-bottom-color: rgba(71, 200, 255, 0.28);
   background: linear-gradient(90deg, rgba(71, 200, 255, 0.18), rgba(71, 200, 255, 0.04));
   color: var(--sp-cyan);
 }
@@ -496,12 +658,13 @@
 
 #stream-pacer-container .countdown-timer {
   margin-left: auto;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
+  font-family: var(--sp-clock-font);
+  font-size: 12px;
   font-weight: 700;
-  letter-spacing: 1px;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
   color: var(--sp-text);
-  text-shadow: 0 0 8px rgba(228, 176, 85, 0.4);
+  text-shadow: 0 0 8px var(--sp-amber-glow);
 }
 
 /* Urgency escalation */
@@ -529,196 +692,43 @@
 }
 
 @keyframes sp-signal-glow {
-  0%, 100% { box-shadow: inset 0 0 20px rgba(228, 176, 85, 0.1); }
-  50% { box-shadow: inset 0 0 30px rgba(228, 176, 85, 0.2); }
+  0%, 100% { box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.04); }
+  50% { box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.08); }
 }
 
 @keyframes sp-pulse-warning {
-  0%, 100% { box-shadow: 0 0 15px rgba(240, 168, 80, 0.2), 0 14px 40px rgba(0, 0, 0, 0.55); }
-  50% { box-shadow: 0 0 25px rgba(240, 168, 80, 0.35), 0 14px 40px rgba(0, 0, 0, 0.55); }
+  0%, 100% {
+    box-shadow:
+      0 22px 60px rgba(0, 0, 0, 0.6),
+      0 0 20px rgba(240, 168, 80, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  }
+  50% {
+    box-shadow:
+      0 22px 60px rgba(0, 0, 0, 0.6),
+      0 0 32px rgba(240, 168, 80, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  }
 }
 
 @keyframes sp-pulse-critical {
-  0%, 100% { box-shadow: 0 0 18px rgba(239, 100, 100, 0.2), 0 14px 40px rgba(0, 0, 0, 0.55); }
-  50% { box-shadow: 0 0 30px rgba(239, 100, 100, 0.4), 0 14px 40px rgba(0, 0, 0, 0.55); }
+  0%, 100% {
+    box-shadow:
+      0 22px 60px rgba(0, 0, 0, 0.6),
+      0 0 22px rgba(239, 100, 100, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  }
+  50% {
+    box-shadow:
+      0 22px 60px rgba(0, 0, 0, 0.6),
+      0 0 36px rgba(239, 100, 100, 0.5),
+      inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  }
 }
 
 @keyframes sp-flash-critical {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.6; }
-}
-
-#stream-pacer-container .pacer-gm-controls {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 2px;
-}
-
-#stream-pacer-container .status-btn,
-#stream-pacer-container .gm-btn {
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
-  border: 1px solid var(--sp-line-strong);
-  color: var(--sp-muted-2);
-  font-size: 10px;
-  cursor: pointer;
-  transition:
-    color 0.2s ease,
-    border-color 0.2s ease,
-    background 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.12s ease;
-  clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
-  position: relative;
-}
-
-#stream-pacer-container .status-btn span,
-#stream-pacer-container .gm-btn span {
-  display: none;
-}
-
-#stream-pacer-container .status-btn::before,
-#stream-pacer-container .gm-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12) 50%, transparent);
-  pointer-events: none;
-}
-
-#stream-pacer-container .status-btn:hover,
-#stream-pacer-container .gm-btn:hover {
-  color: var(--sp-text);
-  border-color: rgba(255, 255, 255, 0.22);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
-  transform: translateY(-1px);
-}
-
-#stream-pacer-container .status-btn:active,
-#stream-pacer-container .gm-btn:active {
-  transform: translateY(0);
-  filter: brightness(0.9);
-}
-
-/* Hand-raised button — color-specific hover */
-#stream-pacer-container .status-btn.status-hand-raised:hover:not(.active) {
-  color: var(--sp-blue);
-  border-color: rgba(90, 163, 240, 0.5);
-  background: rgba(90, 163, 240, 0.1);
-  box-shadow: 0 0 10px rgba(90, 163, 240, 0.3);
-}
-
-/* Active states — status buttons */
-#stream-pacer-container .status-btn.status-engaged.active {
-  color: var(--sp-amber);
-  border-color: var(--sp-amber);
-  background: linear-gradient(180deg, rgba(228, 176, 85, 0.18), rgba(228, 176, 85, 0.06));
-  box-shadow: 0 0 10px rgba(228, 176, 85, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-#stream-pacer-container .status-btn.status-hand-raised.active {
-  color: var(--sp-blue);
-  border-color: var(--sp-blue);
-  background: linear-gradient(135deg, rgba(90, 163, 240, 0.2), rgba(90, 163, 240, 0.08));
-  box-shadow:
-    0 0 15px rgba(90, 163, 240, 0.5),
-    0 0 30px rgba(90, 163, 240, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  animation: sp-hand-btn-pulse 1.6s ease-in-out infinite;
-  overflow: hidden;
-}
-
-#stream-pacer-container .status-btn.status-hand-raised.active::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
-  animation: sp-shimmer-sweep 2s ease-in-out infinite;
-}
-
-#stream-pacer-container .status-btn.status-hand-raised.active i {
-  filter: drop-shadow(0 0 4px rgba(90, 163, 240, 0.8));
-}
-
-#stream-pacer-container .status-btn.status-ready.active {
-  color: var(--sp-green);
-  border-color: var(--sp-green);
-  background: linear-gradient(180deg, rgba(100, 192, 143, 0.18), rgba(100, 192, 143, 0.06));
-  box-shadow: 0 0 10px rgba(100, 192, 143, 0.35);
-}
-
-#stream-pacer-container .status-btn.status-need-time.active {
-  color: var(--sp-purple);
-  border-color: var(--sp-purple);
-  background: linear-gradient(180deg, rgba(166, 132, 255, 0.18), rgba(166, 132, 255, 0.06));
-  box-shadow: 0 0 10px rgba(166, 132, 255, 0.35);
-}
-
-/* Active states — GM buttons */
-#stream-pacer-container .gm-btn.soft-signal-btn:hover,
-#stream-pacer-container .gm-btn.soft-signal-btn.active {
-  color: var(--sp-amber);
-  border-color: var(--sp-amber);
-  background: linear-gradient(180deg, rgba(228, 176, 85, 0.18), rgba(228, 176, 85, 0.06));
-  box-shadow: 0 0 12px rgba(228, 176, 85, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-#stream-pacer-container .gm-btn.soft-signal-btn.active {
-  animation: sp-btn-pulse-amber 2.4s ease-in-out infinite;
-}
-
-#stream-pacer-container .gm-btn.countdown-btn:hover,
-#stream-pacer-container .gm-btn.countdown-btn.active {
-  color: var(--sp-red);
-  border-color: var(--sp-red);
-  background: linear-gradient(180deg, rgba(239, 100, 100, 0.18), rgba(239, 100, 100, 0.06));
-  box-shadow: 0 0 12px rgba(239, 100, 100, 0.35);
-}
-
-#stream-pacer-container .gm-btn.floor-open-btn:hover,
-#stream-pacer-container .gm-btn.floor-open-btn.active {
-  color: var(--sp-cyan);
-  border-color: var(--sp-cyan);
-  background: linear-gradient(180deg, rgba(71, 200, 255, 0.18), rgba(71, 200, 255, 0.06));
-  box-shadow: 0 0 12px rgba(71, 200, 255, 0.35);
-}
-
-#stream-pacer-container .gm-btn.cancel-btn:hover {
-  color: var(--sp-red);
-  border-color: var(--sp-red);
-}
-
-#stream-pacer-container .gm-btn.reset-btn {
-  /* reset uses neutral hover */
-}
-
-@keyframes sp-hand-btn-pulse {
-  0%, 100% {
-    box-shadow:
-      0 0 15px rgba(90, 163, 240, 0.5),
-      0 0 30px rgba(90, 163, 240, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  }
-  50% {
-    box-shadow:
-      0 0 20px rgba(90, 163, 240, 0.7),
-      0 0 40px rgba(90, 163, 240, 0.35),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  }
-}
-
-@keyframes sp-btn-pulse-amber {
-  0%, 100% { box-shadow: 0 0 12px rgba(228, 176, 85, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.1); }
-  50% { box-shadow: 0 0 18px rgba(228, 176, 85, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15); }
 }
 
 /* ========================================
@@ -727,95 +737,66 @@
    ======================================== */
 
 #stream-pacer-container.is-player {
-  width: 178px;
-  font-size: 9px;
-  clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
-}
-
-#stream-pacer-container.is-player::after {
-  left: 7px;
-}
-
-#stream-pacer-container.is-player .sp-accent {
-  bottom: 7px;
-}
-
-#stream-pacer-container.is-player .sp-accent::after {
-  top: 30px;
-  width: 5px;
+  width: 176px;
+  font-size: 10px;
+  border-radius: 12px;
 }
 
 #stream-pacer-container.is-player .pacer-header {
-  gap: 4px;
-  padding: 4px 7px 4px 10px;
-}
-
-#stream-pacer-container.is-player .drag-handle {
-  font-size: 8px;
-}
-
-#stream-pacer-container.is-player .p-ix {
-  font-size: 7.5px;
+  gap: 6px;
+  padding: 6px 8px 5px 8px;
 }
 
 #stream-pacer-container.is-player .pacer-title {
-  font-size: 8px;
-  letter-spacing: 1.6px;
+  font-size: 8.5px;
+  letter-spacing: 0.18em;
 }
 
 #stream-pacer-container.is-player .p-sec {
-  padding: 4px 7px 6px 10px;
+  padding: 5px 8px 7px 8px;
 }
 
 #stream-pacer-container.is-player .p-lbl {
-  gap: 4px;
+  gap: 5px;
   font-size: 7px;
-  letter-spacing: 1.3px;
-  margin-bottom: 3px;
+  letter-spacing: 0.18em;
+  margin-bottom: 4px;
 }
 
 #stream-pacer-container.is-player .p-lbl .num {
-  font-size: 6.5px;
-}
-
-#stream-pacer-container.is-player .pacer-players {
-  gap: 2px;
+  font-size: 7px;
 }
 
 #stream-pacer-container.is-player .player-status {
-  gap: 3px;
-  padding: 1px 4px 1px 3px;
+  gap: 4px;
+  padding: 2px 6px 2px 5px;
   font-size: 8.5px;
 }
 
 #stream-pacer-container.is-player .player-status i {
-  font-size: 6.5px;
+  font-size: 7px;
   width: 8px;
 }
 
 #stream-pacer-container.is-player .player-name {
-  max-width: 48px;
+  max-width: 50px;
 }
 
 #stream-pacer-container.is-player .no-players {
   font-size: 7.5px;
 }
 
-#stream-pacer-container.is-player .status-buttons {
-  gap: 2px;
-}
-
 #stream-pacer-container.is-player .status-btn {
-  height: 19px;
-  font-size: 9.5px;
-  clip-path: polygon(3px 0, 100% 0, 100% calc(100% - 3px), calc(100% - 3px) 100%, 0 100%, 0 3px);
+  height: 21px;
+  font-size: 10px;
+  border-radius: 7px;
 }
 
 #stream-pacer-container.is-player .pacer-signal {
-  gap: 5px;
-  padding: 4px 7px 4px 10px;
+  gap: 6px;
+  padding: 5px 8px;
   font-size: 8px;
-  letter-spacing: 0.9px;
+  letter-spacing: 0.1em;
 }
 
 #stream-pacer-container.is-player .pacer-signal i {
@@ -823,7 +804,26 @@
 }
 
 #stream-pacer-container.is-player .countdown-timer {
-  font-size: 10px;
+  font-size: 11px;
+}
+
+/* Respect reduced-motion for the floating HUD */
+@media (prefers-reduced-motion: reduce) {
+  #stream-pacer-container .sp-accent,
+  #stream-pacer-container .sp-pulse,
+  #stream-pacer-container .pacer-signal,
+  #stream-pacer-container .pacer-signal::after,
+  #stream-pacer-container .player-status.status-hand-raised,
+  #stream-pacer-container .player-status.status-hand-raised i,
+  #stream-pacer-container .player-status.status-hand-raised::after,
+  #stream-pacer-container .status-btn.status-hand-raised.active,
+  #stream-pacer-container .status-btn.status-hand-raised.active::after,
+  #stream-pacer-container .gm-btn.soft-signal-btn.active,
+  #stream-pacer-container.countdown-active.urgency-warning,
+  #stream-pacer-container.countdown-active.urgency-critical,
+  #stream-pacer-container.countdown-active.urgency-critical .countdown-timer {
+    animation: none !important;
+  }
 }
 
 /* ========================================
@@ -1922,39 +1922,6 @@
   font-weight: 600;
 }
 
-.stream-pacer-appearance .sp-preset-select {
-  flex: 1.2;
-}
-
-.stream-pacer-appearance .sp-swatch-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 6px 0 4px;
-}
-
-.stream-pacer-appearance .sp-swatch {
-  display: inline-flex;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.stream-pacer-appearance .sp-swatch i {
-  display: block;
-  width: 22px;
-  height: 16px;
-}
-
-.stream-pacer-appearance .sp-color-group input[type="color"] {
-  width: 60px;
-  height: 28px;
-  padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: transparent;
-  cursor: pointer;
-}
-
 .stream-pacer-appearance .sp-text-group input[type="text"] {
   flex: 1.2;
 }
@@ -1973,13 +1940,6 @@
 .stream-pacer-appearance .sp-appearance-footer {
   margin-top: 14px;
   text-align: right;
-}
-
-.stream-pacer-appearance .sp-appearance-subnote {
-  margin: -4px 0 10px;
-  font-size: 11px;
-  line-height: 1.4;
-  color: var(--sp-muted, #6a7684);
 }
 
 /* ========================================
@@ -2087,543 +2047,4 @@
     animation: none !important;
     transition: none !important;
   }
-}
-
-/* ========================================
-   THEME FAMILY: "core" — clean modern, Foundry-adjacent
-   Flat panels, rounded corners, system font stack, no scanlines/bevels.
-   Decorations (accent stripe, index numbers, panel drift) are stripped.
-   ======================================== */
-
-body[data-sp-family="core"] {
-  --sp-radius-lg: 8px;
-  --sp-radius-md: 6px;
-  --sp-radius-sm: 4px;
-}
-
-/* Panel — flat, rounded, no clip-path bevels, no drift animation. */
-body[data-sp-family="core"] #stream-pacer-container {
-  background: linear-gradient(180deg, #20242c 0%, #161a21 100%);
-  font-family: 'Signika', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  font-size: 11.5px;
-  clip-path: none;
-  border-radius: var(--sp-radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  box-shadow:
-    0 10px 30px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  animation: none;
-}
-
-body[data-sp-family="core"] #stream-pacer-container::before,
-body[data-sp-family="core"] #stream-pacer-container::after {
-  display: none;
-}
-
-/* Strip the sci-fi left accent stripe and its tick mark — clean edge instead. */
-body[data-sp-family="core"] #stream-pacer-container .sp-accent {
-  display: none;
-}
-
-/* Player mode keeps the rounded shape with no separate clip-path tweak. */
-body[data-sp-family="core"] #stream-pacer-container.is-player {
-  clip-path: none;
-  border-radius: var(--sp-radius-md);
-}
-
-body[data-sp-family="core"] #stream-pacer-container.is-player::after {
-  display: none;
-}
-
-/* Header — typography only, no bevelled GM badge. */
-body[data-sp-family="core"] #stream-pacer-container .pacer-header {
-  padding: 9px 12px;
-}
-
-body[data-sp-family="core"] #stream-pacer-container .p-ix,
-body[data-sp-family="core"] #stream-pacer-container .p-lbl .num {
-  display: none;
-}
-
-body[data-sp-family="core"] #stream-pacer-container .pacer-title {
-  font-family: 'Signika', system-ui, sans-serif;
-  font-weight: 600;
-  font-size: 11px;
-  letter-spacing: 0.6px;
-  text-transform: none;
-}
-
-body[data-sp-family="core"] #stream-pacer-container .gm-badge {
-  font-family: 'Signika', system-ui, sans-serif;
-  background: rgba(228, 176, 85, 0.18);
-  color: var(--sp-amber);
-  clip-path: none;
-  border: 1px solid var(--sp-amber-dim);
-  border-radius: var(--sp-radius-sm);
-  box-shadow: none;
-  font-size: 9px;
-  font-weight: 700;
-  letter-spacing: 1.2px;
-  padding: 1px 6px;
-}
-
-/* Section labels — quieter, no rule line "ascii-tech" feel. */
-body[data-sp-family="core"] #stream-pacer-container .p-sec {
-  padding: 9px 12px;
-}
-
-body[data-sp-family="core"] #stream-pacer-container .p-lbl {
-  font-family: 'Signika', system-ui, sans-serif;
-  font-weight: 600;
-  font-size: 10px;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-  color: var(--sp-muted-2);
-  margin-bottom: 7px;
-}
-
-body[data-sp-family="core"] #stream-pacer-container .p-lbl .rule {
-  background: linear-gradient(90deg, rgba(255,255,255,0.08), transparent);
-}
-
-/* Player chips — softer, with rounded borders instead of left-bar accents. */
-body[data-sp-family="core"] #stream-pacer-container .player-status {
-  border-left: none;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--sp-radius-sm);
-  padding: 3px 7px;
-  background: rgba(255, 255, 255, 0.025);
-  font-family: 'Signika', system-ui, sans-serif;
-  letter-spacing: 0;
-  font-size: 10.5px;
-}
-
-body[data-sp-family="core"] #stream-pacer-container .player-status.status-engaged {
-  border-color: var(--sp-amber-dim);
-}
-body[data-sp-family="core"] #stream-pacer-container .player-status.status-ready {
-  border-color: rgba(100, 192, 143, 0.4);
-}
-body[data-sp-family="core"] #stream-pacer-container .player-status.status-need-time {
-  border-color: rgba(166, 132, 255, 0.4);
-}
-body[data-sp-family="core"] #stream-pacer-container .player-status.status-hand-raised {
-  border-color: rgba(90, 163, 240, 0.55);
-}
-
-/* Buttons — flat rectangles with rounded corners, no clip-path or scanline rim. */
-body[data-sp-family="core"] #stream-pacer-container .status-btn,
-body[data-sp-family="core"] #stream-pacer-container .gm-btn {
-  clip-path: none;
-  border-radius: var(--sp-radius-sm);
-  height: 28px;
-}
-
-body[data-sp-family="core"] #stream-pacer-container .status-btn::before,
-body[data-sp-family="core"] #stream-pacer-container .gm-btn::before {
-  display: none;
-}
-
-body[data-sp-family="core"] #stream-pacer-container.is-player .status-btn {
-  clip-path: none;
-  border-radius: var(--sp-radius-sm);
-  height: 24px;
-}
-
-/* Active signal band — flatter, no shimmer. */
-body[data-sp-family="core"] #stream-pacer-container .pacer-signal {
-  padding: 7px 12px;
-  font-family: 'Signika', system-ui, sans-serif;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-  animation: none;
-}
-
-body[data-sp-family="core"] #stream-pacer-container .pacer-signal::after {
-  display: none;
-}
-
-body[data-sp-family="core"] #stream-pacer-container .countdown-timer {
-  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
-  font-size: 13px;
-}
-
-/* Bottom ticker — drop scanline rim and signal-colour rail beveling. */
-body[data-sp-family="core"] .stream-pacer-overlay {
-  background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(14, 17, 22, 0.55) 2%,
-    rgba(20, 24, 32, 0.94) 7%,
-    rgba(20, 24, 32, 0.94) 93%,
-    rgba(14, 17, 22, 0.55) 98%,
-    transparent 100%);
-}
-
-body[data-sp-family="core"] .stream-pacer-overlay::before {
-  display: none; /* drop scanlines */
-}
-
-body[data-sp-family="core"] .stream-pacer-overlay .overlay-ix {
-  display: none; /* drop "NOTICE / 01" tech tag */
-}
-
-body[data-sp-family="core"] .stream-pacer-overlay .overlay-message {
-  font-family: 'Signika', system-ui, sans-serif;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  font-size: 13px;
-}
-
-body[data-sp-family="core"] .stream-pacer-overlay .ticker-separator {
-  border-radius: 50%;
-  transform: none;
-}
-
-/* Hand-raise bar — drop ASCII chip + scanlines, keep core typography. */
-body[data-sp-family="core"] .stream-pacer-hand-bar::before {
-  display: none;
-}
-
-body[data-sp-family="core"] .stream-pacer-hand-bar .hb-ix {
-  display: none;
-}
-
-body[data-sp-family="core"] .stream-pacer-hand-bar .hb-tag {
-  display: none;
-}
-
-body[data-sp-family="core"] .stream-pacer-hand-bar .hb-names {
-  font-family: 'Signika', system-ui, sans-serif;
-  letter-spacing: 2.5px;
-  font-size: 16px;
-}
-
-/* Peril corner indicator — flatter, rounded. */
-body[data-sp-family="core"] .stream-pacer-peril-indicator {
-  clip-path: none;
-  border-radius: var(--sp-radius-md);
-}
-
-body[data-sp-family="core"] .stream-pacer-peril-indicator::before {
-  display: none;
-}
-
-body[data-sp-family="core"] .stream-pacer-peril-indicator .peril-ind-icon {
-  clip-path: none;
-  border-radius: var(--sp-radius-sm);
-}
-
-body[data-sp-family="core"] .stream-pacer-peril-indicator .peril-ind-header,
-body[data-sp-family="core"] .stream-pacer-peril-indicator .peril-ind-main {
-  font-family: 'Signika', system-ui, sans-serif;
-}
-
-/* Dire Peril stage — drop sci-fi vocabulary. */
-body[data-sp-family="core"] .stream-pacer-peril-stage::before { display: none; } /* scanlines */
-body[data-sp-family="core"] .stream-pacer-peril-stage .pk-marquee,
-body[data-sp-family="core"] .stream-pacer-peril-stage .pk-stream,
-body[data-sp-family="core"] .stream-pacer-peril-stage .pk-reticle {
-  display: none;
-}
-
-body[data-sp-family="core"] .stream-pacer-peril-stage .pk-tag {
-  clip-path: none;
-  border-radius: var(--sp-radius-sm);
-  font-family: 'Signika', system-ui, sans-serif;
-  letter-spacing: 4px;
-}
-
-body[data-sp-family="core"] .stream-pacer-peril-stage .pk-corner {
-  width: 38px;
-  height: 38px;
-}
-
-/* ========================================
-   THEME FAMILY: "fantasy" — dark gothic, polished
-   Cinzel headers, ornamental corner brackets via pseudos, filigree hairlines.
-   No parchment textures — stays clean against dark scene maps.
-   ======================================== */
-
-body[data-sp-family="fantasy"] {
-  --sp-radius-lg: 3px;
-  --sp-radius-md: 2px;
-  --sp-corner: 14px; /* size of decorative L-bracket corners */
-}
-
-/* Panel — deep slate with warmer undertone; ornamental brackets at corners. */
-body[data-sp-family="fantasy"] #stream-pacer-container {
-  background:
-    radial-gradient(120% 80% at 50% 0%, rgba(228, 176, 85, 0.06), transparent 60%),
-    linear-gradient(180deg, #16161e 0%, #0c0c12 100%);
-  font-family: 'Rajdhani', 'Signika', sans-serif;
-  clip-path: none;
-  border: 1px solid var(--sp-amber-dim);
-  border-radius: var(--sp-radius-lg);
-  box-shadow:
-    0 14px 40px rgba(0, 0, 0, 0.6),
-    inset 0 0 22px rgba(0, 0, 0, 0.45),
-    0 0 0 1px rgba(0, 0, 0, 0.4);
-  animation: none;
-}
-
-/* Drop the scanline grain — fantasy gets a filigree hairline instead. */
-body[data-sp-family="fantasy"] #stream-pacer-container::before {
-  background:
-    repeating-linear-gradient(0deg, transparent 0 5px, rgba(228, 176, 85, 0.018) 5px 6px);
-}
-
-/* Top hairline — keep, but warm it. */
-body[data-sp-family="fantasy"] #stream-pacer-container::after {
-  left: 0;
-  background: linear-gradient(90deg,
-    transparent,
-    var(--sp-amber-glow) 30%,
-    var(--sp-amber-glow) 70%,
-    transparent);
-  height: 1px;
-}
-
-/* Ornamental corner brackets — drawn with a second container layer via the
-   accent stripe element, repurposed as an L-frame. */
-body[data-sp-family="fantasy"] #stream-pacer-container .sp-accent {
-  top: 0; left: 0; bottom: 0; width: 100%;
-  background: none;
-  box-shadow: none;
-  pointer-events: none;
-  z-index: 2;
-}
-
-body[data-sp-family="fantasy"] #stream-pacer-container .sp-accent::before,
-body[data-sp-family="fantasy"] #stream-pacer-container .sp-accent::after {
-  content: '';
-  position: absolute;
-  width: var(--sp-corner);
-  height: var(--sp-corner);
-  border: 1px solid var(--sp-amber);
-  filter: drop-shadow(0 0 4px var(--sp-amber-glow));
-}
-
-/* Top-left corner */
-body[data-sp-family="fantasy"] #stream-pacer-container .sp-accent::before {
-  top: -1px; left: -1px;
-  border-right: none;
-  border-bottom: none;
-  border-top-left-radius: 4px;
-}
-
-/* Bottom-right corner */
-body[data-sp-family="fantasy"] #stream-pacer-container .sp-accent::after {
-  bottom: -1px; right: -1px;
-  border-left: none;
-  border-top: none;
-  border-bottom-right-radius: 4px;
-}
-
-/* Player layout — also gets ornamental corners. */
-body[data-sp-family="fantasy"] #stream-pacer-container.is-player {
-  clip-path: none;
-  border-radius: var(--sp-radius-lg);
-}
-
-body[data-sp-family="fantasy"] #stream-pacer-container.is-player::after {
-  left: 0;
-}
-
-/* Header — Cinzel display font, slightly larger letter-spacing for grandeur. */
-body[data-sp-family="fantasy"] #stream-pacer-container .pacer-title {
-  font-family: 'Cinzel', serif;
-  font-weight: 600;
-  font-size: 10px;
-  letter-spacing: 3px;
-}
-
-/* Drop sci-fi "01" tech indices. */
-body[data-sp-family="fantasy"] #stream-pacer-container .p-ix,
-body[data-sp-family="fantasy"] #stream-pacer-container .p-lbl .num {
-  display: none;
-}
-
-body[data-sp-family="fantasy"] #stream-pacer-container .gm-badge {
-  font-family: 'Cinzel', serif;
-  background: linear-gradient(135deg, var(--sp-amber) 0%, #8d6b2f 100%);
-  letter-spacing: 1.6px;
-  clip-path: none;
-  border-radius: var(--sp-radius-sm);
-}
-
-body[data-sp-family="fantasy"] #stream-pacer-container .p-lbl {
-  font-family: 'Cinzel', serif;
-  font-weight: 500;
-  font-size: 9px;
-  letter-spacing: 2.4px;
-}
-
-/* Player chips — angled bracket on left edge, serif typography. */
-body[data-sp-family="fantasy"] #stream-pacer-container .player-status {
-  font-family: 'Rajdhani', sans-serif;
-  border-radius: 0 var(--sp-radius-sm) var(--sp-radius-sm) 0;
-}
-
-/* Buttons — squared with subtle inner border, no clip-path bevel. */
-body[data-sp-family="fantasy"] #stream-pacer-container .status-btn,
-body[data-sp-family="fantasy"] #stream-pacer-container .gm-btn {
-  clip-path: none;
-  border-radius: var(--sp-radius-sm);
-  border-color: var(--sp-amber-dim);
-  background: linear-gradient(180deg, rgba(228, 176, 85, 0.04), rgba(0, 0, 0, 0.15));
-}
-
-body[data-sp-family="fantasy"] #stream-pacer-container .status-btn:hover,
-body[data-sp-family="fantasy"] #stream-pacer-container .gm-btn:hover {
-  border-color: var(--sp-amber);
-  background: linear-gradient(180deg, rgba(228, 176, 85, 0.14), rgba(228, 176, 85, 0.03));
-  box-shadow: 0 0 12px var(--sp-amber-glow);
-}
-
-body[data-sp-family="fantasy"] #stream-pacer-container.is-player .status-btn {
-  clip-path: none;
-  border-radius: var(--sp-radius-sm);
-}
-
-/* Active signal — serif command lettering. */
-body[data-sp-family="fantasy"] #stream-pacer-container .pacer-signal {
-  font-family: 'Cinzel', serif;
-  font-weight: 500;
-  letter-spacing: 2px;
-}
-
-body[data-sp-family="fantasy"] #stream-pacer-container .countdown-timer {
-  font-family: 'Cormorant Garamond', 'JetBrains Mono', monospace;
-  font-style: italic;
-  font-weight: 600;
-}
-
-/* Bottom ticker — soften, swap font, drop the tech index. */
-body[data-sp-family="fantasy"] .stream-pacer-overlay {
-  background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(12, 12, 18, 0.55) 2%,
-    rgba(22, 22, 30, 0.96) 7%,
-    rgba(22, 22, 30, 0.96) 93%,
-    rgba(12, 12, 18, 0.55) 98%,
-    transparent 100%);
-}
-
-body[data-sp-family="fantasy"] .stream-pacer-overlay::before {
-  background:
-    repeating-linear-gradient(0deg, transparent 0 6px, rgba(228, 176, 85, 0.015) 6px 7px);
-}
-
-body[data-sp-family="fantasy"] .stream-pacer-overlay .overlay-ix {
-  display: none;
-}
-
-body[data-sp-family="fantasy"] .stream-pacer-overlay .overlay-message {
-  font-family: 'Cinzel', serif;
-  font-weight: 600;
-  letter-spacing: 4px;
-  font-size: 13px;
-}
-
-body[data-sp-family="fantasy"] .stream-pacer-overlay .overlay-countdown {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-weight: 600;
-  font-size: 17px;
-  letter-spacing: 1px;
-}
-
-/* Diamond → small rotated square + filigree dot pair. */
-body[data-sp-family="fantasy"] .stream-pacer-overlay .ticker-separator {
-  width: 5px;
-  height: 5px;
-}
-
-/* Hand-raise bar — replace ASCII chip with simple serif label. */
-body[data-sp-family="fantasy"] .stream-pacer-hand-bar .hb-ix {
-  display: none;
-}
-
-body[data-sp-family="fantasy"] .stream-pacer-hand-bar .hb-names {
-  font-family: 'Cinzel', serif;
-  letter-spacing: 5px;
-  font-size: 16px;
-}
-
-body[data-sp-family="fantasy"] .stream-pacer-hand-bar .hb-tag {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  letter-spacing: 2px;
-  text-transform: none;
-}
-
-/* Peril indicator — square corners + ornamental edge. */
-body[data-sp-family="fantasy"] .stream-pacer-peril-indicator {
-  clip-path: none;
-  border-radius: var(--sp-radius-md);
-}
-
-body[data-sp-family="fantasy"] .stream-pacer-peril-indicator .peril-ind-icon {
-  clip-path: none;
-  border-radius: var(--sp-radius-sm);
-}
-
-body[data-sp-family="fantasy"] .stream-pacer-peril-indicator .peril-ind-header {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-}
-
-body[data-sp-family="fantasy"] .stream-pacer-peril-indicator .peril-ind-main {
-  font-family: 'Cinzel', serif;
-  letter-spacing: 3px;
-}
-
-/* Dire Peril stage — keep cinematic envelope, swap vocab to arcane. */
-body[data-sp-family="fantasy"] .stream-pacer-peril-stage .pk-stream {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 12px;
-  letter-spacing: 5px;
-  color: var(--sp-peril-bright);
-}
-
-body[data-sp-family="fantasy"] .stream-pacer-peril-stage .pk-marquee-row {
-  font-family: 'Cinzel', serif;
-  -webkit-text-stroke-width: 1px;
-}
-
-body[data-sp-family="fantasy"] .stream-pacer-peril-stage .pk-tag {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 14px;
-  letter-spacing: 6px;
-  clip-path: none;
-  border-radius: var(--sp-radius-sm);
-}
-
-body[data-sp-family="fantasy"] .stream-pacer-peril-stage .pk-line {
-  font-family: 'Cinzel', serif;
-}
-
-body[data-sp-family="fantasy"] .stream-pacer-peril-stage .pk-sub {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: italic;
-  font-size: 14px;
-  letter-spacing: 5px;
-}
-
-/* Reticle → faint circular sigil instead of crosshairs. */
-body[data-sp-family="fantasy"] .stream-pacer-peril-stage .pk-rh,
-body[data-sp-family="fantasy"] .stream-pacer-peril-stage .pk-rv {
-  opacity: 0.45;
-}
-body[data-sp-family="fantasy"] .stream-pacer-peril-stage .pk-rd {
-  width: 280px;
-  height: 280px;
-  border-radius: 50%;
-  transform: translate(-50%, -50%) rotate(0);
-  border-width: 1px;
-  animation-name: pk-spin;
 }

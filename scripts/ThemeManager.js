@@ -1,32 +1,15 @@
-import { MODULE_ID } from './settings.js';
-
 /**
- * Central appearance controller.
+ * Central appearance controller — single fixed "Arcane Glass" theme.
  *
- * Resolves two layered choices into a single applied theme:
- *   - Theme family (sci-fi | core | fantasy) selects the visual language:
- *     fonts, shapes, decorations. Exposed to CSS via a [data-sp-family]
- *     attribute on <html> and <body>.
- *   - Color preset (or custom pair) sets the accent + peril hues. Resolved
- *     into a flat map of CSS custom properties on :root so the whole UI
- *     re-themes live.
- *
- * Also exposes the derived Dire Peril color bed for the WebGL renderer.
+ * There is no longer a family/preset selector: the look is fixed. The full
+ * palette lives in CSS (:root); this class re-stamps the accent and Dire Peril
+ * custom properties from one source of truth so the WebGL danger field and the
+ * CSS stay in sync, and exposes the derived Dire Peril color bed for the
+ * renderer.
  */
 
-/** Built-in color presets. Names are family-neutral; each resolves to a base pair. */
-export const THEME_PRESETS = {
-  'arknights-amber': { accent: '#e4b055', peril: '#d6184a' },
-  'endfield-blue':   { accent: '#5ad1ff', peril: '#2f7bff' },
-  'crimson-protocol':{ accent: '#ff6a4d', peril: '#ff1030' },
-  'void-violet':     { accent: '#a684ff', peril: '#c026d3' },
-  'verdant-ops':     { accent: '#4fd18b', peril: '#19b36b' }
-};
-
-export const DEFAULT_PRESET = 'arknights-amber';
-
-export const THEME_FAMILIES = ['sci-fi', 'core', 'fantasy'];
-export const DEFAULT_FAMILY = 'core';
+/** The one and only theme — cool "Arcane Glass" chrome with a warm amber accent. */
+export const DEFAULT_THEME = { accent: '#e4b055', peril: '#d6184a' };
 
 function clamp8(n) {
   return Math.max(0, Math.min(255, Math.round(n)));
@@ -70,35 +53,12 @@ class ThemeManagerClass {
     this._peril = null; // cached { deep, mid, hot } as 0..1 rgb arrays
   }
 
-  /** Resolve the configured base colors, falling back gracefully. */
-  _resolveBase() {
-    let family = DEFAULT_FAMILY;
-    let preset = DEFAULT_PRESET;
-    let accent = THEME_PRESETS[DEFAULT_PRESET].accent;
-    let peril = THEME_PRESETS[DEFAULT_PRESET].peril;
-    try {
-      const f = game.settings.get(MODULE_ID, 'themeFamily');
-      if (THEME_FAMILIES.includes(f)) family = f;
-      preset = game.settings.get(MODULE_ID, 'themePreset') || DEFAULT_PRESET;
-      if (preset === 'custom') {
-        accent = game.settings.get(MODULE_ID, 'accentColor') || accent;
-        peril = game.settings.get(MODULE_ID, 'perilColor') || peril;
-      } else if (THEME_PRESETS[preset]) {
-        accent = THEME_PRESETS[preset].accent;
-        peril = THEME_PRESETS[preset].peril;
-      }
-    } catch (e) {
-      /* settings not ready — use defaults */
-    }
-    return { family, preset, accent, peril };
-  }
+  /** Build the accent + Dire Peril custom-property map from the fixed theme. */
+  _buildPalette() {
+    const a = hexToRgb(DEFAULT_THEME.accent);
+    const p = hexToRgb(DEFAULT_THEME.peril);
 
-  /** Build the full CSS custom-property map from the two base colors. */
-  _buildPalette(base) {
-    const a = hexToRgb(base.accent);
-    const p = hexToRgb(base.peril);
-
-    // Derived accent tones — softer dim, brighter glow.
+    // Derived accent tone — a softer, brighter sibling for highlights.
     const accentSoft = lighten(a, 0.18);
 
     // Derived peril tones — a deep near-black bed, a bright highlight, and a
@@ -134,10 +94,9 @@ class ThemeManagerClass {
     return vars;
   }
 
-  /** Write the resolved palette onto :root via a managed <style> element. */
+  /** Write the fixed palette onto :root via a managed <style> element. */
   apply() {
-    const base = this._resolveBase();
-    const vars = this._buildPalette(base);
+    const vars = this._buildPalette();
     const body = Object.entries(vars)
       .map(([k, v]) => `  ${k}: ${v};`)
       .join('\n');
@@ -149,22 +108,12 @@ class ThemeManagerClass {
       document.head.appendChild(this._styleEl);
     }
     this._styleEl.textContent = css;
-
-    // Stamp the family on root + body so CSS can branch off it.
-    const family = base.family;
-    document.documentElement.setAttribute('data-sp-family', family);
-    if (document.body) document.body.setAttribute('data-sp-family', family);
   }
 
   /** Normalized peril colors for the WebGL shader. */
   getPerilWebGLColors() {
-    if (!this._peril) this._buildPalette(this._resolveBase());
+    if (!this._peril) this._buildPalette();
     return this._peril;
-  }
-
-  /** Currently active family — convenience for any caller that needs it. */
-  getFamily() {
-    return this._resolveBase().family;
   }
 
   initialize() {
