@@ -1,53 +1,6 @@
 <div class="sp-appearance">
   <p class="sp-appearance-note">{{localize "STREAM_PACER.Settings.AppearanceIntro"}}</p>
 
-  <div class="form-group">
-    <label>{{localize "STREAM_PACER.Settings.ThemeFamily"}}</label>
-    <select name="themeFamily" class="sp-preset-select">
-      {{#each families}}
-      <option value="{{this.key}}" {{#if this.selected}}selected{{/if}} title="{{this.hint}}">{{this.label}}</option>
-      {{/each}}
-    </select>
-  </div>
-
-  <p class="sp-appearance-note sp-appearance-subnote">{{localize "STREAM_PACER.Settings.ThemeFamilyHint"}}</p>
-
-  <div class="form-group">
-    <label>{{localize "STREAM_PACER.Settings.ThemePreset"}}</label>
-    <select name="themePreset" class="sp-preset-select">
-      {{#each presets}}
-      <option value="{{this.key}}" {{#if this.selected}}selected{{/if}}>{{this.label}}</option>
-      {{/each}}
-    </select>
-  </div>
-
-  <div class="sp-swatch-row">
-    {{#each presets}}
-    {{#if this.swatch}}
-    <span class="sp-swatch" title="{{this.label}}">
-      <i style="background: {{this.swatch.accent}}"></i>
-      <i style="background: {{this.swatch.peril}}"></i>
-    </span>
-    {{/if}}
-    {{/each}}
-  </div>
-
-  <hr>
-
-  <p class="sp-appearance-note">{{localize "STREAM_PACER.Settings.CustomColorsHint"}}</p>
-
-  <div class="form-group sp-color-group">
-    <label>{{localize "STREAM_PACER.Settings.AccentColor"}}</label>
-    <input type="color" name="accentColor" value="{{accentColor}}">
-  </div>
-
-  <div class="form-group sp-color-group">
-    <label>{{localize "STREAM_PACER.Settings.PerilColor"}}</label>
-    <input type="color" name="perilColor" value="{{perilColor}}">
-  </div>
-
-  <hr>
-
   {{#if isGM}}
   <p class="sp-appearance-note">{{localize "STREAM_PACER.Settings.PerilTextHint"}}</p>
 

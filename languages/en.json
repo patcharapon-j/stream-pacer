@@ -81,39 +81,15 @@
 
       "Appearance": "Appearance",
       "AppearanceLabel": "Customize Appearance",
-      "AppearanceHint": "Choose a theme family, color palette, and effect settings for the Stream Pacer HUD and the Dire Peril screen",
-      "AppearanceIntro": "Pick a theme family for the overall visual language, then a color palette to tint it. Custom unlocks free-form accent and peril colors.",
-      "ThemeFamily": "Theme Family",
-      "ThemeFamilyHint": "Family controls the visual language — fonts, shapes, and decoration style. The color palette below tints whichever family is active.",
-      "ThemePreset": "Color Palette",
-      "CustomColorsHint": "Custom colors apply only when the 'Custom' palette is selected above.",
-      "AccentColor": "Accent Color",
-      "PerilColor": "Dire Peril Color",
+      "AppearanceHint": "Customize the Dire Peril reveal text and effect settings for Stream Pacer",
+      "AppearanceIntro": "Stream Pacer uses a single refined \"Arcane Glass\" look. Use the options below to customize the Dire Peril reveal and effects.",
       "PerilWebGL": "Dire Peril WebGL Effect",
       "PerilWebGLHint": "Render the cinematic WebGL danger field during the Dire Peril reveal. Disable on low-end machines.",
       "PerilTextHint": "Customize the Dire Peril reveal text (GM only — shared with all players). Leave a field blank to use the default.",
       "PerilTextDire": "Title — Line 1",
       "PerilTextPeril": "Title — Line 2",
       "PerilTextTag": "Hazard Tag",
-      "PerilTextSubtitle": "Subtitle",
-      "Family": {
-        "sci-fi": "Sci-Fi — Operator Panel",
-        "core": "Core — Clean Modern",
-        "fantasy": "Fantasy — Arcane"
-      },
-      "FamilyHint": {
-        "sci-fi": "Beveled panels, scanline grain, tech monospace indices — the original Operator look.",
-        "core": "Flat panels, rounded corners, system fonts — sits cleanly inside Foundry's native chrome.",
-        "fantasy": "Ornamental brackets, serif display headers, filigree hairlines — dark gothic, polished."
-      },
-      "Preset": {
-        "arknights-amber": "Amber",
-        "endfield-blue": "Azure",
-        "crimson-protocol": "Crimson",
-        "void-violet": "Violet",
-        "verdant-ops": "Verdant",
-        "custom": "Custom"
-      }
+      "PerilTextSubtitle": "Subtitle"
     }
   }
 }

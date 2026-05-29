@@ -1,4 +1,4 @@
-import { ThemeManager, THEME_PRESETS, DEFAULT_PRESET, THEME_FAMILIES, DEFAULT_FAMILY } from './ThemeManager.js';
+import { ThemeManager } from './ThemeManager.js';
 
 export const MODULE_ID = 'stream-pacer';
 
@@ -70,11 +70,6 @@ class ExemptUsersConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 
 async function saveAppearance(_event, _form, formData) {
   const data = formData?.object ?? {};
-  const family = THEME_FAMILIES.includes(data.themeFamily) ? data.themeFamily : DEFAULT_FAMILY;
-  await game.settings.set(MODULE_ID, 'themeFamily', family);
-  await game.settings.set(MODULE_ID, 'themePreset', data.themePreset || DEFAULT_PRESET);
-  if (data.accentColor) await game.settings.set(MODULE_ID, 'accentColor', data.accentColor);
-  if (data.perilColor) await game.settings.set(MODULE_ID, 'perilColor', data.perilColor);
   await game.settings.set(MODULE_ID, 'perilWebGLEnabled', data.perilWebGLEnabled === true);
 
   // Dire Peril text is world-scoped — only GMs may write it.
@@ -114,35 +109,8 @@ class AppearanceConfig extends HandlebarsApplicationMixin(ApplicationV2) {
   };
 
   async _prepareContext() {
-    const currentFamily = game.settings.get(MODULE_ID, 'themeFamily') || DEFAULT_FAMILY;
-    const families = THEME_FAMILIES.map(key => ({
-      key,
-      label: game.i18n.localize(`STREAM_PACER.Settings.Family.${key}`),
-      hint: game.i18n.localize(`STREAM_PACER.Settings.FamilyHint.${key}`),
-      selected: key === currentFamily
-    }));
-
-    const current = game.settings.get(MODULE_ID, 'themePreset') || DEFAULT_PRESET;
-    const presets = Object.keys(THEME_PRESETS).map(key => ({
-      key,
-      label: game.i18n.localize(`STREAM_PACER.Settings.Preset.${key}`),
-      selected: key === current,
-      swatch: THEME_PRESETS[key]
-    }));
-    presets.push({
-      key: 'custom',
-      label: game.i18n.localize('STREAM_PACER.Settings.Preset.custom'),
-      selected: current === 'custom',
-      swatch: null
-    });
-
     return {
-      families,
-      presets,
-      accentColor: game.settings.get(MODULE_ID, 'accentColor'),
-      perilColor: game.settings.get(MODULE_ID, 'perilColor'),
       perilWebGLEnabled: game.settings.get(MODULE_ID, 'perilWebGLEnabled'),
-      isCustom: current === 'custom',
       isGM: game.user.isGM,
       perilTextDire: game.settings.get(MODULE_ID, 'perilTextDire'),
       perilTextPeril: game.settings.get(MODULE_ID, 'perilTextPeril'),
@@ -156,74 +124,8 @@ class AppearanceConfig extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 }
 
-/**
- * One-time migration to preserve sci-fi for users upgrading from the
- * single-family release. New installs default to 'core'; if the user had
- * customized any theme setting OR placed the HUD, they were running the old
- * sci-fi-only build, so we keep them on sci-fi.
- */
-export async function migrateThemeFamily() {
-  try {
-    if (game.settings.get(MODULE_ID, 'themeFamilyMigrationDone')) return;
-
-    const customized =
-      game.settings.get(MODULE_ID, 'themePreset') !== DEFAULT_PRESET ||
-      game.settings.get(MODULE_ID, 'accentColor') !== THEME_PRESETS[DEFAULT_PRESET].accent ||
-      game.settings.get(MODULE_ID, 'perilColor') !== THEME_PRESETS[DEFAULT_PRESET].peril;
-
-    const hudPos = game.settings.get(MODULE_ID, 'hudPosition');
-    const positionedHud = !!(hudPos && (hudPos.left !== null || hudPos.top !== null));
-
-    if (customized || positionedHud) {
-      await game.settings.set(MODULE_ID, 'themeFamily', 'sci-fi');
-    }
-    await game.settings.set(MODULE_ID, 'themeFamilyMigrationDone', true);
-  } catch (e) {
-    /* settings not ready or failed — skip silently, will retry next session */
-  }
-}
-
 export function registerSettings() {
-  // --- Appearance / Tech Display ---
-  game.settings.register(MODULE_ID, 'themeFamily', {
-    scope: 'client',
-    config: false,
-    type: String,
-    default: DEFAULT_FAMILY,
-    onChange: () => ThemeManager.apply()
-  });
-
-  game.settings.register(MODULE_ID, 'themeFamilyMigrationDone', {
-    scope: 'client',
-    config: false,
-    type: Boolean,
-    default: false
-  });
-
-  game.settings.register(MODULE_ID, 'themePreset', {
-    scope: 'client',
-    config: false,
-    type: String,
-    default: DEFAULT_PRESET,
-    onChange: () => ThemeManager.apply()
-  });
-
-  game.settings.register(MODULE_ID, 'accentColor', {
-    scope: 'client',
-    config: false,
-    type: String,
-    default: THEME_PRESETS[DEFAULT_PRESET].accent,
-    onChange: () => ThemeManager.apply()
-  });
-
-  game.settings.register(MODULE_ID, 'perilColor', {
-    scope: 'client',
-    config: false,
-    type: String,
-    default: THEME_PRESETS[DEFAULT_PRESET].peril,
-    onChange: () => ThemeManager.apply()
-  });
-
+  // --- Appearance ---
   game.settings.register(MODULE_ID, 'perilWebGLEnabled', {
     scope: 'client',
     config: false,
