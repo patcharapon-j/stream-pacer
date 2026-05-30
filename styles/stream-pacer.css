@@ -1845,9 +1845,9 @@
   animation: sp-aura-breath 3.4s ease-in-out infinite;
 }
 
-/* Top-anchored aura — sits directly below the hand-raise bar, fades downward. */
+/* Top-anchored aura — sits directly below the hand-raise bar, slides down. */
 .stream-pacer-bar-aura.aura-top {
-  top: 46px; /* equals hand-bar height */
+  top: 44px; /* equals hand-bar height */
   height: 138px; /* ~3x */
   background:
     linear-gradient(to bottom,
