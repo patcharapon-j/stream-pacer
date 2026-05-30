@@ -4,7 +4,7 @@
    Dire Peril: royal purple + red touch, kinetic-typography full-screen reveal.
 */
 
-@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@500;600;700&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap');
 
 :root {
   /* Ink — panel background tones */
@@ -104,7 +104,7 @@
   position: relative;
   width: 202px;
   color: var(--sp-text);
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: var(--sp-clock-font);
   font-size: 11px;
   border-radius: 14px;
   overflow: hidden;
@@ -787,7 +787,7 @@
   transform: translateY(100%);
   transition: opacity 0.45s var(--sp-ease-glass), visibility 0.45s var(--sp-ease-glass), transform 0.45s var(--sp-ease-glass);
   color: var(--sp-text);
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: var(--sp-clock-font);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 60%),
     linear-gradient(90deg, transparent 0%, rgba(10, 13, 18, 0.5) 2%, rgba(22, 28, 40, 0.92) 8%, rgba(10, 13, 19, 0.94) 50%, rgba(22, 28, 40, 0.92) 92%, rgba(10, 13, 18, 0.5) 98%, transparent 100%);
@@ -911,7 +911,7 @@
 }
 
 .stream-pacer-overlay .overlay-message {
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: var(--sp-clock-font);
   font-size: 12.5px;
   font-weight: 700;
   letter-spacing: 0.18em;
@@ -969,7 +969,7 @@
   align-items: center;
   z-index: 100;
   color: #fff;
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: var(--sp-clock-font);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0) 60%),
     linear-gradient(90deg, transparent 0%, rgba(10, 13, 18, 0.45) 3%, rgba(28, 56, 104, 0.85) 8%, rgba(42, 92, 168, 0.9) 50%, rgba(28, 56, 104, 0.85) 92%, rgba(10, 13, 18, 0.45) 97%, transparent 100%);
@@ -1059,7 +1059,7 @@
 }
 
 .stream-pacer-hand-bar .hb-names {
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: var(--sp-clock-font);
   font-size: 17px;
   font-weight: 700;
   letter-spacing: 0.18em;
