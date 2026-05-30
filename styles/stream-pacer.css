@@ -4,7 +4,7 @@
    Dire Peril: royal purple + red touch, kinetic-typography full-screen reveal.
 */
 
-@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@500;600;700&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oxanium:wght@400;500;600;700&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&display=swap');
 
 :root {
   /* Ink — panel background tones */
@@ -104,7 +104,7 @@
   position: relative;
   width: 202px;
   color: var(--sp-text);
-  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-family: var(--sp-clock-font);
   font-size: 11px;
   border-radius: 14px;
   overflow: hidden;
@@ -136,26 +136,9 @@
   transition: opacity 1s ease, background 1s ease;
 }
 
-/* Kinetic light sweep — repurposes the .sp-accent element */
+/* Static accent element — kept for markup compatibility, no moving shimmer */
 #stream-pacer-container .sp-accent {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: 40%;
-  z-index: 4;
-  pointer-events: none;
-  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.14), transparent);
-  transform: translateX(-160%) skewX(-12deg);
-  opacity: 0;
-  animation: sp-sweep 7s var(--sp-ease-glass) infinite;
-}
-
-@keyframes sp-sweep {
-  0% { transform: translateX(-160%) skewX(-12deg); opacity: 0; }
-  8% { opacity: 1; }
-  24% { transform: translateX(320%) skewX(-12deg); opacity: 0; }
-  100% { transform: translateX(320%) skewX(-12deg); opacity: 0; }
+  display: none;
 }
 
 /* Signal state recolors the ambient glow + edge; the band carries the detail */
@@ -382,17 +365,6 @@
   animation: sp-hand-icon-pulse 1.6s ease-in-out infinite;
 }
 
-#stream-pacer-container .player-status.status-hand-raised::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 70%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
-  animation: sp-shimmer-sweep 2.6s ease-in-out infinite;
-}
-
 #stream-pacer-container .no-players {
   color: var(--sp-muted-2);
   font-style: italic;
@@ -416,11 +388,6 @@
 @keyframes sp-hand-icon-pulse {
   0%, 100% { filter: drop-shadow(0 0 4px rgba(90, 163, 240, 0.9)); }
   50% { filter: drop-shadow(0 0 8px rgba(90, 163, 240, 1)); }
-}
-
-@keyframes sp-shimmer-sweep {
-  0% { left: -100%; }
-  60%, 100% { left: 200%; }
 }
 
 /* ========================================
@@ -508,17 +475,6 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.2);
   animation: sp-hand-btn-pulse 1.6s ease-in-out infinite;
   overflow: hidden;
-}
-
-#stream-pacer-container .status-btn.status-hand-raised.active::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
-  animation: sp-shimmer-sweep 2s ease-in-out infinite;
 }
 
 #stream-pacer-container .status-btn.status-hand-raised.active i {
@@ -643,17 +599,6 @@
 
 #stream-pacer-container .pacer-signal.hard-signal i {
   filter: drop-shadow(0 0 6px rgba(239, 100, 100, 0.6));
-}
-
-#stream-pacer-container .pacer-signal::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
-  animation: sp-shimmer-sweep 4s ease-in-out infinite;
 }
 
 #stream-pacer-container .countdown-timer {
@@ -809,15 +754,11 @@
 
 /* Respect reduced-motion for the floating HUD */
 @media (prefers-reduced-motion: reduce) {
-  #stream-pacer-container .sp-accent,
   #stream-pacer-container .sp-pulse,
   #stream-pacer-container .pacer-signal,
-  #stream-pacer-container .pacer-signal::after,
   #stream-pacer-container .player-status.status-hand-raised,
   #stream-pacer-container .player-status.status-hand-raised i,
-  #stream-pacer-container .player-status.status-hand-raised::after,
   #stream-pacer-container .status-btn.status-hand-raised.active,
-  #stream-pacer-container .status-btn.status-hand-raised.active::after,
   #stream-pacer-container .gm-btn.soft-signal-btn.active,
   #stream-pacer-container.countdown-active.urgency-warning,
   #stream-pacer-container.countdown-active.urgency-critical,
@@ -827,7 +768,7 @@
 }
 
 /* ========================================
-   Bottom Ticker
+   Bottom Ticker — Arcane Glass
    ======================================== */
 
 .stream-pacer-overlay {
@@ -835,7 +776,7 @@
   bottom: 0;
   left: 0;
   right: 0;
-  height: 38px;
+  height: 36px;
   display: flex;
   align-items: center;
   pointer-events: none;
@@ -843,53 +784,37 @@
   opacity: 0;
   visibility: hidden;
   overflow: hidden;
-  transition: opacity 0.4s ease, visibility 0.4s ease, bottom 0.4s ease;
+  transform: translateY(100%);
+  transition: opacity 0.45s var(--sp-ease-glass), visibility 0.45s var(--sp-ease-glass), transform 0.45s var(--sp-ease-glass);
   color: var(--sp-text);
-  font-family: 'Rajdhani', sans-serif;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(10, 13, 18, 0.6) 2%,
-    rgba(20, 24, 32, 0.96) 7%,
-    rgba(20, 24, 32, 0.96) 93%,
-    rgba(10, 13, 18, 0.6) 98%,
-    transparent 100%);
+  font-family: var(--sp-clock-font);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 60%),
+    linear-gradient(90deg, transparent 0%, rgba(10, 13, 18, 0.5) 2%, rgba(22, 28, 40, 0.92) 8%, rgba(10, 13, 19, 0.94) 50%, rgba(22, 28, 40, 0.92) 92%, rgba(10, 13, 18, 0.5) 98%, transparent 100%);
+  border-top: 1px solid var(--sp-edge);
   box-shadow:
-    0 -4px 18px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+    0 -8px 30px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    0 0 30px var(--sp-glow-soft);
+  backdrop-filter: blur(12px) saturate(1.1);
 }
 
 .stream-pacer-overlay.active {
   opacity: 1;
   visibility: visible;
-}
-
-/* Scan line overlay */
-.stream-pacer-overlay::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: repeating-linear-gradient(0deg, transparent 0 2px, rgba(255, 255, 255, 0.02) 2px 3px);
-  pointer-events: none;
-  z-index: 2;
+  transform: translateY(0);
 }
 
 /* Tint overlay — signal-colored band */
 .stream-pacer-overlay .sp-tint {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg,
-    transparent 0%,
-    transparent 3%,
-    rgba(228, 176, 85, 0.16) 10%,
-    rgba(228, 176, 85, 0.08) 50%,
-    rgba(228, 176, 85, 0.16) 90%,
-    transparent 97%,
-    transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, transparent 3%, rgba(228, 176, 85, 0.14) 10%, rgba(228, 176, 85, 0.06) 50%, rgba(228, 176, 85, 0.14) 90%, transparent 97%, transparent 100%);
   z-index: 1;
+  transition: background 0.4s ease;
 }
 
-/* Top rail — signal-colored hairline */
+/* Top rail — signal-colored glowing hairline */
 .stream-pacer-overlay .sp-rail {
   position: absolute;
   top: 0;
@@ -897,54 +822,32 @@
   right: 3%;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--sp-amber), transparent);
-  box-shadow: 0 0 8px rgba(228, 176, 85, 0.6);
+  box-shadow: 0 0 10px var(--sp-amber-glow);
   z-index: 4;
 }
 
-/* Variant: soft signal (default amber) — already set above */
-
 .stream-pacer-overlay.countdown-signal .sp-tint {
-  background: linear-gradient(90deg,
-    transparent 0%, transparent 3%,
-    rgba(239, 100, 100, 0.16) 10%,
-    rgba(239, 100, 100, 0.08) 50%,
-    rgba(239, 100, 100, 0.16) 90%,
-    transparent 97%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, transparent 3%, rgba(239, 100, 100, 0.16) 10%, rgba(239, 100, 100, 0.07) 50%, rgba(239, 100, 100, 0.16) 90%, transparent 97%, transparent 100%);
 }
 .stream-pacer-overlay.countdown-signal .sp-rail {
   background: linear-gradient(90deg, transparent, var(--sp-red), transparent);
-  box-shadow: 0 0 8px rgba(239, 100, 100, 0.6);
+  box-shadow: 0 0 10px rgba(239, 100, 100, 0.6);
 }
 
 .stream-pacer-overlay.floor-open-signal .sp-tint {
-  background: linear-gradient(90deg,
-    transparent 0%, transparent 3%,
-    rgba(71, 200, 255, 0.16) 10%,
-    rgba(71, 200, 255, 0.08) 50%,
-    rgba(71, 200, 255, 0.16) 90%,
-    transparent 97%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, transparent 3%, rgba(71, 200, 255, 0.16) 10%, rgba(71, 200, 255, 0.07) 50%, rgba(71, 200, 255, 0.16) 90%, transparent 97%, transparent 100%);
 }
 .stream-pacer-overlay.floor-open-signal .sp-rail {
   background: linear-gradient(90deg, transparent, var(--sp-cyan), transparent);
-  box-shadow: 0 0 8px rgba(71, 200, 255, 0.6);
+  box-shadow: 0 0 10px rgba(71, 200, 255, 0.6);
 }
 
 .stream-pacer-overlay.urgency-warning .sp-tint {
-  background: linear-gradient(90deg,
-    transparent 0%, transparent 3%,
-    rgba(240, 168, 80, 0.2) 10%,
-    rgba(240, 168, 80, 0.1) 50%,
-    rgba(240, 168, 80, 0.2) 90%,
-    transparent 97%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, transparent 3%, rgba(240, 168, 80, 0.2) 10%, rgba(240, 168, 80, 0.1) 50%, rgba(240, 168, 80, 0.2) 90%, transparent 97%, transparent 100%);
 }
 
 .stream-pacer-overlay.urgency-critical .sp-tint {
-  background: linear-gradient(90deg,
-    transparent 0%, transparent 3%,
-    rgba(245, 60, 60, 0.22) 10%,
-    rgba(245, 60, 60, 0.12) 50%,
-    rgba(245, 60, 60, 0.22) 90%,
-    transparent 97%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, transparent 3%, rgba(245, 60, 60, 0.24) 10%, rgba(245, 60, 60, 0.12) 50%, rgba(245, 60, 60, 0.24) 90%, transparent 97%, transparent 100%);
   animation: sp-ticker-glow 1s ease-in-out infinite;
 }
 
@@ -955,7 +858,7 @@
   display: flex;
   align-items: center;
   white-space: nowrap;
-  animation: sp-ticker-scroll 28s linear infinite;
+  animation: sp-ticker-scroll 30s linear infinite;
   -webkit-mask-image: linear-gradient(90deg, transparent, black 5%, black 95%, transparent);
           mask-image: linear-gradient(90deg, transparent, black 5%, black 95%, transparent);
 }
@@ -967,7 +870,7 @@
 
 @keyframes sp-ticker-glow {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.85; }
+  50% { opacity: 0.82; }
 }
 
 .stream-pacer-overlay .ticker-segment {
@@ -978,9 +881,9 @@
 }
 
 .stream-pacer-overlay .overlay-ix {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 9.5px;
-  letter-spacing: 2px;
+  font-family: var(--sp-clock-font);
+  font-size: 10px;
+  letter-spacing: 0.18em;
   color: var(--sp-amber);
   opacity: 0.9;
   text-transform: uppercase;
@@ -994,7 +897,7 @@
   align-items: center;
   font-size: 14px;
   color: var(--sp-amber);
-  filter: drop-shadow(0 0 6px rgba(228, 176, 85, 0.7));
+  filter: drop-shadow(0 0 6px var(--sp-amber-glow));
 }
 
 .stream-pacer-overlay.countdown-signal .overlay-icon {
@@ -1008,20 +911,21 @@
 }
 
 .stream-pacer-overlay .overlay-message {
-  font-family: 'Rajdhani', sans-serif;
-  font-size: 13px;
+  font-family: var(--sp-clock-font);
+  font-size: 12.5px;
   font-weight: 700;
-  letter-spacing: 3px;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--sp-text);
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
 }
 
 .stream-pacer-overlay .overlay-countdown {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--sp-clock-font);
   font-size: 15px;
   font-weight: 700;
-  letter-spacing: 1.5px;
+  letter-spacing: 0.06em;
+  font-variant-numeric: tabular-nums;
   color: var(--sp-red);
   text-shadow: 0 0 8px rgba(239, 100, 100, 0.5);
 }
@@ -1038,7 +942,7 @@
   transform: rotate(45deg);
   display: inline-block;
   flex-shrink: 0;
-  box-shadow: 0 0 8px rgba(228, 176, 85, 0.6);
+  box-shadow: 0 0 8px var(--sp-amber-glow);
 }
 
 .stream-pacer-overlay.countdown-signal .ticker-separator {
@@ -1052,7 +956,7 @@
 }
 
 /* ========================================
-   Hand-Raise Bar (GM only, top of screen)
+   Hand-Raise Bar (GM only, top of screen) — Arcane Glass
    ======================================== */
 
 .stream-pacer-hand-bar {
@@ -1060,30 +964,25 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 46px;
+  height: 44px;
   display: flex;
   align-items: center;
   z-index: 100;
   color: #fff;
-  font-family: 'Rajdhani', sans-serif;
-
-  background: linear-gradient(90deg,
-    transparent 0%,
-    rgba(15, 19, 26, 0.55) 3%,
-    rgba(30, 80, 140, 0.85) 8%,
-    rgba(70, 140, 220, 0.92) 50%,
-    rgba(30, 80, 140, 0.85) 92%,
-    rgba(15, 19, 26, 0.55) 97%,
-    transparent 100%);
+  font-family: var(--sp-clock-font);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0) 60%),
+    linear-gradient(90deg, transparent 0%, rgba(10, 13, 18, 0.45) 3%, rgba(28, 56, 104, 0.85) 8%, rgba(42, 92, 168, 0.9) 50%, rgba(28, 56, 104, 0.85) 92%, rgba(10, 13, 18, 0.45) 97%, transparent 100%);
+  border-bottom: 1px solid rgba(120, 165, 240, 0.45);
   box-shadow:
-    0 4px 18px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
-
+    0 8px 30px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    0 0 36px rgba(90, 163, 240, 0.3);
+  backdrop-filter: blur(14px) saturate(1.15);
   opacity: 0;
   visibility: hidden;
   transform: translateY(-100%);
-  transition: opacity 0.4s ease, visibility 0.4s ease, transform 0.4s ease;
+  transition: opacity 0.45s var(--sp-ease-glass), visibility 0.45s var(--sp-ease-glass), transform 0.45s var(--sp-ease-spring);
   overflow: hidden;
 }
 
@@ -1091,43 +990,6 @@
   opacity: 1;
   visibility: visible;
   transform: translateY(0);
-  animation: sp-handbar-breath 3s ease-in-out infinite;
-}
-
-/* Grain overlay */
-.stream-pacer-hand-bar::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    repeating-linear-gradient(0deg, transparent 0 2px, rgba(255, 255, 255, 0.02) 2px 3px),
-    repeating-linear-gradient(45deg, transparent 0 22px, rgba(0, 0, 0, 0.04) 22px 23px);
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* Shimmer sweep */
-.stream-pacer-hand-bar::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -50%;
-  width: 45%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
-  animation: sp-handbar-sweep 5s ease-in-out infinite;
-  z-index: 2;
-}
-
-@keyframes sp-handbar-breath {
-  0%, 100% { filter: brightness(1); }
-  50% { filter: brightness(1.12); }
-}
-
-@keyframes sp-handbar-sweep {
-  0% { left: -50%; opacity: 0; }
-  15%, 85% { opacity: 1; }
-  100% { left: 150%; opacity: 0; }
 }
 
 .stream-pacer-hand-bar .hand-bar-content {
@@ -1153,27 +1015,29 @@
 }
 .stream-pacer-hand-bar .hb-edge-b {
   bottom: 6px;
-  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.35), transparent);
+  background: linear-gradient(90deg, transparent, rgba(90, 163, 240, 0.5), transparent);
+  box-shadow: 0 0 8px rgba(90, 163, 240, 0.4);
 }
 
 .stream-pacer-hand-bar .hb-row {
   display: inline-flex;
   align-items: center;
-  gap: 18px;
+  gap: 16px;
   position: relative;
   z-index: 3;
 }
 
 .stream-pacer-hand-bar .hb-ix {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--sp-clock-font);
   font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 3px;
-  padding: 3px 8px;
-  background: rgba(0, 0, 0, 0.35);
-  color: rgba(255, 255, 255, 0.85);
-  clip-path: polygon(5px 0, 100% 0, calc(100% - 5px) 100%, 0 100%);
-  border-left: 2px solid rgba(255, 255, 255, 0.5);
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  padding: 3px 9px;
+  border-radius: 7px;
+  background: rgba(0, 0, 0, 0.3);
+  color: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
   text-transform: uppercase;
 }
 
@@ -1181,7 +1045,7 @@
   font-size: 22px;
   color: #fff;
   flex-shrink: 0;
-  animation: sp-hb-icon 1.6s ease-in-out infinite;
+  animation: sp-hb-icon 1.8s ease-in-out infinite;
 }
 
 .stream-pacer-hand-bar .hb-icon i {
@@ -1189,53 +1053,40 @@
 }
 
 @keyframes sp-hb-icon {
-  0%, 100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  30% {
-    transform: translateY(-2px) rotate(-6deg);
-  }
-  60% {
-    transform: translateY(-2px) rotate(6deg);
-  }
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  30% { transform: translateY(-2px) rotate(-6deg); }
+  60% { transform: translateY(-2px) rotate(6deg); }
 }
 
 .stream-pacer-hand-bar .hb-names {
-  font-family: 'Rajdhani', sans-serif;
+  font-family: var(--sp-clock-font);
   font-size: 17px;
   font-weight: 700;
-  letter-spacing: 4px;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: #fff;
   text-shadow:
-    0 0 10px rgba(255, 255, 255, 0.6),
-    0 0 24px rgba(90, 163, 240, 0.5),
+    0 0 12px rgba(255, 255, 255, 0.55),
+    0 0 26px rgba(90, 163, 240, 0.55),
     0 2px 4px rgba(0, 0, 0, 0.5);
-  animation: sp-hb-text-glow 2s ease-in-out infinite;
-}
-
-@keyframes sp-hb-text-glow {
-  0%, 100% {
-    text-shadow:
-      0 0 10px rgba(255, 255, 255, 0.6),
-      0 0 24px rgba(90, 163, 240, 0.5),
-      0 2px 4px rgba(0, 0, 0, 0.5);
-  }
-  50% {
-    text-shadow:
-      0 0 20px rgba(255, 255, 255, 0.85),
-      0 0 40px rgba(90, 163, 240, 0.65),
-      0 2px 4px rgba(0, 0, 0, 0.5);
-  }
 }
 
 .stream-pacer-hand-bar .hb-tag {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: var(--sp-clock-font);
   font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 2px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
   color: rgba(255, 255, 255, 0.75);
   text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stream-pacer-overlay .overlay-content,
+  .stream-pacer-overlay.urgency-critical .sp-tint,
+  .stream-pacer-overlay.urgency-critical .overlay-countdown,
+  .stream-pacer-hand-bar .hb-icon {
+    animation: none !important;
+  }
 }
 
 /* Dire Peril button */
@@ -1956,25 +1807,33 @@
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.4s ease, visibility 0.4s ease;
+  transition: opacity 0.45s var(--sp-ease-glass), visibility 0.45s var(--sp-ease-glass), transform 0.45s var(--sp-ease-glass);
   --sp-aura-color: var(--sp-amber-glow);
   --sp-aura-mid:   var(--sp-amber-dim);
-  will-change: opacity;
+  will-change: opacity, transform;
 }
 
 /* Aura sits one layer below its bar so the bar always reads in front, but
    above the scene canvas so it isn't washed out by terrain. */
-.stream-pacer-bar-aura.aura-bottom { z-index: 9; }
-.stream-pacer-bar-aura.aura-top    { z-index: 99; }
+/* Hidden state: parked just off-screen past the bar's edge, so the aura
+   slides into place together with its bar instead of merely cross-fading. */
+.stream-pacer-bar-aura.aura-bottom { z-index: 9; transform: translateY(100%); }
+.stream-pacer-bar-aura.aura-top {
+  z-index: 99;
+  transform: translateY(-100%);
+  /* match the hand-bar's spring entrance */
+  transition: opacity 0.45s var(--sp-ease-glass), visibility 0.45s var(--sp-ease-glass), transform 0.45s var(--sp-ease-spring);
+}
 
 .stream-pacer-bar-aura.active {
   opacity: 1;
   visibility: visible;
+  transform: translateY(0);
 }
 
-/* Bottom-anchored aura — sits directly above the bottom ticker, fades upward. */
+/* Bottom-anchored aura — sits directly above the bottom ticker, slides up. */
 .stream-pacer-bar-aura.aura-bottom {
-  bottom: 38px; /* equals overlay height */
+  bottom: 36px; /* equals overlay height */
   height: 114px; /* ~3x */
   background:
     linear-gradient(to top,
@@ -1986,9 +1845,9 @@
   animation: sp-aura-breath 3.4s ease-in-out infinite;
 }
 
-/* Top-anchored aura — sits directly below the hand-raise bar, fades downward. */
+/* Top-anchored aura — sits directly below the hand-raise bar, slides down. */
 .stream-pacer-bar-aura.aura-top {
-  top: 46px; /* equals hand-bar height */
+  top: 44px; /* equals hand-bar height */
   height: 138px; /* ~3x */
   background:
     linear-gradient(to bottom,
@@ -2002,8 +1861,7 @@
 
 /* Breath pulses brightness only — never opacity. Animating opacity here would
    override the .active fade transition and desync the aura from the bar on
-   show/dismiss (the bar's sp-handbar-breath is brightness-only for the same
-   reason). The dim rest frame fakes the old opacity dip. */
+   show/dismiss. The dim rest frame fakes a subtle opacity dip. */
 @keyframes sp-aura-breath {
   0%, 100% { filter: brightness(0.92); }
   50%      { filter: brightness(1.12); }
