@@ -1807,25 +1807,33 @@
   pointer-events: none;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.4s ease, visibility 0.4s ease;
+  transition: opacity 0.45s var(--sp-ease-glass), visibility 0.45s var(--sp-ease-glass), transform 0.45s var(--sp-ease-glass);
   --sp-aura-color: var(--sp-amber-glow);
   --sp-aura-mid:   var(--sp-amber-dim);
-  will-change: opacity;
+  will-change: opacity, transform;
 }
 
 /* Aura sits one layer below its bar so the bar always reads in front, but
    above the scene canvas so it isn't washed out by terrain. */
-.stream-pacer-bar-aura.aura-bottom { z-index: 9; }
-.stream-pacer-bar-aura.aura-top    { z-index: 99; }
+/* Hidden state: parked just off-screen past the bar's edge, so the aura
+   slides into place together with its bar instead of merely cross-fading. */
+.stream-pacer-bar-aura.aura-bottom { z-index: 9; transform: translateY(100%); }
+.stream-pacer-bar-aura.aura-top {
+  z-index: 99;
+  transform: translateY(-100%);
+  /* match the hand-bar's spring entrance */
+  transition: opacity 0.45s var(--sp-ease-glass), visibility 0.45s var(--sp-ease-glass), transform 0.45s var(--sp-ease-spring);
+}
 
 .stream-pacer-bar-aura.active {
   opacity: 1;
   visibility: visible;
+  transform: translateY(0);
 }
 
-/* Bottom-anchored aura — sits directly above the bottom ticker, fades upward. */
+/* Bottom-anchored aura — sits directly above the bottom ticker, slides up. */
 .stream-pacer-bar-aura.aura-bottom {
-  bottom: 38px; /* equals overlay height */
+  bottom: 36px; /* equals overlay height */
   height: 114px; /* ~3x */
   background:
     linear-gradient(to top,
