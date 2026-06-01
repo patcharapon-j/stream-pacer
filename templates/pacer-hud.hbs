@@ -14,15 +14,11 @@
 
   {{!-- Operators Section --}}
   <div class="p-sec">
-    <div class="p-lbl">
-      <span class="num">01</span>
-      <span>{{localize "STREAM_PACER.SectionOperators"}}</span>
-      <span class="rule"></span>
-    </div>
     <div class="pacer-players">
       {{#each players}}
       <div class="player-status {{statusClass}}" title="{{name}}: {{statusTitle}}">
         <i class="fa-solid {{statusIcon}}"></i>
+        <span class="p-name">{{name}}</span>
       </div>
       {{else}}
       <div class="no-players">{{localize "STREAM_PACER.NoPlayers"}}</div>
@@ -33,11 +29,6 @@
   {{!-- Player Status Buttons (non-GM only) --}}
   {{#unless isGM}}
   <div class="p-sec pacer-my-status">
-    <div class="p-lbl">
-      <span class="num">02</span>
-      <span>{{localize "STREAM_PACER.SectionStatus"}}</span>
-      <span class="rule"></span>
-    </div>
     <div class="status-buttons">
       <button type="button" class="status-btn status-engaged {{#if myStatusEngaged}}active{{/if}}"
               data-action="set-status" data-status="engaged"
@@ -83,11 +74,6 @@
   {{!-- GM Controls --}}
   {{#if isGM}}
   <div class="p-sec pacer-gm-controls-wrap">
-    <div class="p-lbl">
-      <span class="num">02</span>
-      <span>{{localize "STREAM_PACER.SectionCommand"}}</span>
-      <span class="rule"></span>
-    </div>
     <div class="pacer-gm-controls">
       <button type="button" class="gm-btn soft-signal-btn {{#if isSoftSignal}}active{{/if}}"
               data-action="soft-signal"
