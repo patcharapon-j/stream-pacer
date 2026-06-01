@@ -259,7 +259,8 @@
 
 #stream-pacer-container .pacer-players {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
   align-items: flex-start;
   gap: 3px;
 }
