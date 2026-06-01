@@ -259,17 +259,17 @@
 
 #stream-pacer-container .pacer-players {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 3px;
 }
 
 #stream-pacer-container .player-status {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  border-radius: 5px;
+  gap: 6px;
+  width: 100%;
+  padding: 2px 6px;
+  border-radius: 6px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.015));
   border: 1px solid var(--sp-hair);
   color: var(--sp-text);
@@ -280,10 +280,23 @@
 }
 
 #stream-pacer-container .player-status i {
+  width: 12px;
   font-size: 8px;
   line-height: 1;
   text-align: center;
   flex-shrink: 0;
+}
+
+#stream-pacer-container .player-status .p-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 8.5px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: none;
 }
 
 /* Engaged — amber */
@@ -666,12 +679,17 @@
 }
 
 #stream-pacer-container.is-player .player-status {
-  width: 16px;
-  height: 16px;
+  gap: 5px;
+  padding: 2px 5px;
 }
 
 #stream-pacer-container.is-player .player-status i {
+  width: 11px;
   font-size: 7px;
+}
+
+#stream-pacer-container.is-player .player-status .p-name {
+  font-size: 8px;
 }
 
 #stream-pacer-container.is-player .no-players {
