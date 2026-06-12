@@ -23,13 +23,20 @@ const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
 
 async function saveExemptUsers(_event, _form, formData) {
   const data = formData?.object ?? {};
+  // Two independent exemption lists share one form. "bars-" checkboxes drive
+  // the general pacer UI; "peril-" checkboxes drive the Dire Peril splash.
   const exemptUsers = [];
+  const perilExemptUsers = [];
   for (const [key, value] of Object.entries(data)) {
-    if (key.startsWith('user-') && value) {
-      exemptUsers.push(key.replace('user-', ''));
+    if (!value) continue;
+    if (key.startsWith('bars-')) {
+      exemptUsers.push(key.replace('bars-', ''));
+    } else if (key.startsWith('peril-')) {
+      perilExemptUsers.push(key.replace('peril-', ''));
     }
   }
   await game.settings.set(MODULE_ID, 'exemptUsers', exemptUsers);
+  await game.settings.set(MODULE_ID, 'perilExemptUsers', perilExemptUsers);
 }
 
 class ExemptUsersConfig extends HandlebarsApplicationMixin(ApplicationV2) {
@@ -59,10 +66,12 @@ class ExemptUsersConfig extends HandlebarsApplicationMixin(ApplicationV2) {
 
   async _prepareContext() {
     const exemptUsers = game.settings.get(MODULE_ID, 'exemptUsers');
+    const perilExemptUsers = game.settings.get(MODULE_ID, 'perilExemptUsers');
     const users = game.users.map(u => ({
       id: u.id,
       name: u.name,
-      isExempt: exemptUsers.includes(u.id)
+      isExempt: exemptUsers.includes(u.id),
+      isPerilExempt: perilExemptUsers.includes(u.id)
     }));
     return { users };
   }
@@ -196,10 +205,22 @@ export function registerSettings() {
     default: true
   });
 
-  // Exempt users (won't see the pacer UI - useful for streaming)
+  // Exempt users (won't see the general pacer UI / bars - useful for streaming)
   game.settings.register(MODULE_ID, 'exemptUsers', {
     name: 'STREAM_PACER.Settings.ExemptUsers',
     hint: 'STREAM_PACER.Settings.ExemptUsersHint',
+    scope: 'world',
+    config: false,
+    type: Array,
+    default: []
+  });
+
+  // Dire Peril exempt users (won't see the Dire Peril splash / indicator).
+  // Tracked separately from exemptUsers so a user can be hidden from the
+  // general bars while still seeing the Dire Peril reveal (or vice versa).
+  game.settings.register(MODULE_ID, 'perilExemptUsers', {
+    name: 'STREAM_PACER.Settings.PerilExemptUsers',
+    hint: 'STREAM_PACER.Settings.PerilExemptUsersHint',
     scope: 'world',
     config: false,
     type: Array,
