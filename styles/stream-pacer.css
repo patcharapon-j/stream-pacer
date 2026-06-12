@@ -1760,6 +1760,43 @@
 }
 
 /* ========================================
+   Exempt Users config — two-column table
+   (General Bars vs. Dire Peril exemptions)
+   ======================================== */
+
+.stream-pacer-exempt-users-content .stream-pacer-exempt-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 8px 0 4px;
+}
+
+.stream-pacer-exempt-users-content .stream-pacer-exempt-table th,
+.stream-pacer-exempt-users-content .stream-pacer-exempt-table td {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--sp-hairline, rgba(255, 255, 255, 0.08));
+}
+
+.stream-pacer-exempt-users-content .stream-pacer-exempt-table th {
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.stream-pacer-exempt-users-content .stream-pacer-exempt-table th.exempt-col,
+.stream-pacer-exempt-users-content .stream-pacer-exempt-table td.exempt-cell {
+  width: 1%;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.stream-pacer-exempt-users-content .stream-pacer-exempt-table td.user-name {
+  font-weight: 600;
+}
+
+.stream-pacer-exempt-users-content .stream-pacer-exempt-table input[type="checkbox"] {
+  margin: 0;
+}
+
+/* ========================================
    Aura halo behind edge-to-edge bars
    Lives as a sibling of the bar (created in JS) so it can extend ~3x the
    bar height past the screen edge without the bar's overflow clipping it.

@@ -28,9 +28,13 @@ Hooks.once('ready', async () => {
   // Apply the fixed Arcane Glass palette before any UI renders.
   ThemeManager.initialize();
 
-  // Check if current user is exempt
+  // Two independent exemptions: the general pacer UI (bars/signals) and the
+  // Dire Peril splash. A user can be hidden from one while still seeing the
+  // other — e.g. a streaming overlay that shows only the Dire Peril reveal.
   const exemptUsers = game.settings.get(MODULE_ID, 'exemptUsers');
   const isExempt = exemptUsers.includes(game.user.id);
+  const perilExemptUsers = game.settings.get(MODULE_ID, 'perilExemptUsers');
+  const isPerilExempt = perilExemptUsers.includes(game.user.id);
 
   // Initialize the socket handler (always needed for state sync)
   SocketHandler.initialize();
@@ -38,7 +42,7 @@ Hooks.once('ready', async () => {
   // Initialize the pacer manager
   PacerManager.initialize();
 
-  // Only initialize UI components if not exempt
+  // Only initialize the general pacer UI if not exempt from the bars
   if (!isExempt) {
     // Create and render the HUD
     pacerHUD = new PacerHUD();
@@ -47,7 +51,10 @@ Hooks.once('ready', async () => {
     // Initialize overlay for signals
     pacerOverlay = new PacerOverlay();
     pacerOverlay.initialize();
+  }
 
+  // The Dire Peril splash is gated by its own exemption list
+  if (!isPerilExempt) {
     perilOverlay = new PerilOverlay();
     perilOverlay.initialize();
   }
@@ -80,7 +87,7 @@ Hooks.once('ready', async () => {
   };
 
   // Late-join: if peril is already active, show the indicator only (no replay).
-  if (!isExempt && PacerManager.getState().direPerilActive) {
+  if (!isPerilExempt && PacerManager.getState().direPerilActive) {
     perilOverlay.showIndicatorOnly();
   }
 });
