@@ -111,4 +111,45 @@
     </div>
   </div>
   {{/if}}
+
+  {{!-- Spotlight Tracker (GM only) --}}
+  {{#if isGM}}{{#if spotlight.show}}
+  <div class="p-sec spotlight-sec">
+    <div class="spotlight-head">
+      <span class="sl-title">
+        <i class="fa-solid fa-bullseye"></i>
+        {{localize "STREAM_PACER.Spotlight.Title"}}
+      </span>
+      <button type="button" class="sl-reset" data-action="spotlight-reset"
+              title="{{localize 'STREAM_PACER.Spotlight.ResetTooltip'}}">
+        <i class="fa-solid fa-arrows-rotate"></i>
+      </button>
+    </div>
+
+    <div class="spotlight-list">
+      {{#each spotlight.players}}
+      <div class="sl-row {{#if active}}is-active{{/if}} {{#if underserved}}is-underserved{{/if}}"
+           data-user-id="{{userId}}">
+        <button type="button" class="sl-toggle" data-action="spotlight-toggle" data-user-id="{{userId}}"
+                title="{{localize 'STREAM_PACER.Spotlight.ToggleTooltip'}}"
+                aria-pressed="{{#if active}}true{{else}}false{{/if}}">
+          <i class="fa-solid {{#if active}}fa-circle-dot{{else}}fa-circle{{/if}}"></i>
+        </button>
+        <span class="sl-name">{{name}}</span>
+        <span class="sl-bar"><span class="sl-bar-fill" style="width:{{pct}}%"></span></span>
+        <span class="sl-time">{{formatted}}</span>
+        <i class="sl-warn fa-solid fa-triangle-exclamation"
+           title="{{localize 'STREAM_PACER.Spotlight.UnderservedTooltip'}}"></i>
+      </div>
+      {{/each}}
+    </div>
+
+    <div class="spotlight-next {{#unless spotlight.nextUp}}is-hidden{{/unless}}">
+      <i class="fa-solid fa-arrow-right-long"></i>
+      <span class="sl-next-label">{{localize "STREAM_PACER.Spotlight.NextUp"}}:</span>
+      <strong class="sl-next-name">{{#if spotlight.nextUp}}{{spotlight.nextUp.name}}{{/if}}</strong>
+      <span class="sl-next-deficit">{{#if spotlight.nextUp}}{{spotlight.nextUp.deficitLabel}}{{/if}}</span>
+    </div>
+  </div>
+  {{/if}}{{/if}}
 </div>

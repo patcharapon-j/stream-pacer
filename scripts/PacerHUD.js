@@ -79,9 +79,33 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
       }
     }
 
+    // Spotlight tracker — GM-only fairness view.
+    let spotlight = null;
+    if (game.user.isGM) {
+      const summary = PacerManager.getSpotlightSummary();
+      spotlight = {
+        show: summary.hasPlayers,
+        players: summary.players.map(p => ({
+          userId: p.userId,
+          name: p.name,
+          active: p.active,
+          underserved: p.underserved,
+          pct: p.pct,
+          formatted: PacerHUD._formatDuration(p.seconds)
+        })),
+        nextUp: summary.nextUp
+          ? {
+              name: summary.nextUp.name,
+              deficitLabel: game.i18n.format('STREAM_PACER.Spotlight.Deficit', { pct: summary.nextUp.deficitPct })
+            }
+          : null
+      };
+    }
+
     return {
       isGM: game.user.isGM,
       players,
+      spotlight,
       myStatus,
       myStatusEngaged: myStatus === PLAYER_STATUS.ENGAGED,
       myStatusHandRaised: myStatus === PLAYER_STATUS.HAND_RAISED,
@@ -99,6 +123,14 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
       PLAYER_STATUS,
       GM_SIGNAL
     };
+  }
+
+  // m:ss formatter shared by the template context and the in-place tick path.
+  static _formatDuration(totalSeconds) {
+    const s = Math.max(0, Math.floor(totalSeconds));
+    const minutes = Math.floor(s / 60);
+    const seconds = s % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   }
 
   _getStatusIcon(status) {
@@ -139,11 +171,19 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
       // re-render replaces the DOM and restarts the panel's CSS animations, so
       // update the timer in place when nothing structural has changed.
       if (this._canUpdateInPlace(state)) {
-        this._updateCountdownInPlace(state);
+        this._updateInPlace(state);
       } else {
         this.render(false);
       }
     });
+  }
+
+  // Dispatch the per-second tick to whichever live elements are present, so a
+  // ticking spotlight or countdown updates text in place rather than forcing a
+  // full re-render (which would restart the panel's CSS animations).
+  _updateInPlace(state) {
+    if (state.gmSignal === GM_SIGNAL.COUNTDOWN) this._updateCountdownInPlace(state);
+    if (game.user.isGM) this._updateSpotlightInPlace();
   }
 
   _onRender(context, options) {
@@ -176,20 +216,37 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
       .map(p => `${p.userId}:${p.status}`)
       .sort()
       .join('|');
+    // The spotlight roster and active set are structural; the seconds, bars,
+    // and underserved flags tick in place and are deliberately excluded.
+    let spotlightSig = '';
+    if (game.user.isGM) {
+      spotlightSig = PacerManager.getSpotlightSummary().players
+        .map(p => `${p.userId}:${p.active ? 1 : 0}`)
+        .sort()
+        .join('|');
+    }
+
     return [
       state.gmSignal,
       state.direPerilActive,
       state.handRaisedCount,
       PacerManager.getPlayerStatus(game.user.id),
-      playerSig
+      playerSig,
+      spotlightSig
     ].join('#');
   }
 
   _canUpdateInPlace(state) {
-    return state.gmSignal === GM_SIGNAL.COUNTDOWN
-      && this._lastSignature !== null
-      && this._lastSignature === this._structuralSignature(state)
+    if (this._lastSignature === null) return false;
+    if (this._lastSignature !== this._structuralSignature(state)) return false;
+
+    const countdownTicking = state.gmSignal === GM_SIGNAL.COUNTDOWN
       && !!this.element?.querySelector('.countdown-timer');
+    const spotlightTicking = game.user.isGM
+      && !!this.element?.querySelector('.spotlight-sec')
+      && PacerManager.getSpotlightSummary().players.some(p => p.active);
+
+    return countdownTicking || spotlightTicking;
   }
 
   _updateCountdownInPlace(state) {
@@ -216,6 +273,43 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
       root.classList.remove('urgency-normal', 'urgency-warning', 'urgency-critical');
       root.classList.add(`urgency-${urgency}`);
       this._countdownUrgency = urgency;
+    }
+  }
+
+  // Refresh the spotlight timers, deficit bars, underserved flags, and the
+  // "next up" nudge without rebuilding the section. The roster and active set
+  // are part of the structural signature, so the rows here are guaranteed to
+  // exist and only their numbers/flags change.
+  _updateSpotlightInPlace() {
+    const section = this.element?.querySelector('.spotlight-sec');
+    if (!section) return;
+
+    const summary = PacerManager.getSpotlightSummary();
+    const byId = new Map(summary.players.map(p => [p.userId, p]));
+
+    section.querySelectorAll('.sl-row').forEach(row => {
+      const p = byId.get(row.dataset.userId);
+      if (!p) return;
+      const timeEl = row.querySelector('.sl-time');
+      if (timeEl) timeEl.textContent = PacerHUD._formatDuration(p.seconds);
+      const fill = row.querySelector('.sl-bar-fill');
+      if (fill) fill.style.width = `${p.pct}%`;
+      row.classList.toggle('is-underserved', !!p.underserved);
+    });
+
+    const nextEl = section.querySelector('.spotlight-next');
+    if (nextEl) {
+      if (summary.nextUp) {
+        nextEl.classList.remove('is-hidden');
+        const nameEl = nextEl.querySelector('.sl-next-name');
+        const deficitEl = nextEl.querySelector('.sl-next-deficit');
+        if (nameEl) nameEl.textContent = summary.nextUp.name;
+        if (deficitEl) {
+          deficitEl.textContent = game.i18n.format('STREAM_PACER.Spotlight.Deficit', { pct: summary.nextUp.deficitPct });
+        }
+      } else {
+        nextEl.classList.add('is-hidden');
+      }
     }
   }
 
@@ -257,6 +351,15 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
           break;
         case 'declare-peril':
           if (game.user.isGM) PacerManager.declareDirePeril();
+          break;
+        case 'spotlight-toggle': {
+          if (!game.user.isGM) break;
+          const userId = target.dataset.userId;
+          PacerManager.setSpotlight(userId, !PacerManager.isSpotlightActive(userId));
+          break;
+        }
+        case 'spotlight-reset':
+          if (game.user.isGM) this._confirmSpotlightReset();
           break;
       }
     };
@@ -308,6 +411,17 @@ export class PacerHUD extends HandlebarsApplicationMixin(ApplicationV2) {
       ],
       rejectClose: false
     });
+  }
+
+  // A session's spotlight tracking is costly to lose, so confirm before wiping.
+  async _confirmSpotlightReset() {
+    const confirmed = await foundry.applications.api.DialogV2.confirm({
+      window: { title: game.i18n.localize('STREAM_PACER.Spotlight.ResetTitle') },
+      content: `<p>${game.i18n.localize('STREAM_PACER.Spotlight.ResetConfirm')}</p>`,
+      rejectClose: false,
+      modal: true
+    });
+    if (confirmed) PacerManager.resetSpotlight();
   }
 
   _onClose(options) {

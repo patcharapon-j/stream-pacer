@@ -13,7 +13,9 @@ const EVENTS = {
   SYNC_STATE: 'syncState',
   RESET_ALL: 'resetAll',
   DIRE_PERIL_DECLARE: 'direPerilDeclare',
-  DIRE_PERIL_DISMISS: 'direPerilDismiss'
+  DIRE_PERIL_DISMISS: 'direPerilDismiss',
+  SPOTLIGHT_UPDATE: 'spotlightUpdate',
+  SPOTLIGHT_RESET: 'spotlightReset'
 };
 
 class SocketHandlerClass {
@@ -117,6 +119,16 @@ class SocketHandlerClass {
         if (!senderIsGM) break;
         PacerManager.receiveDirePerilDismiss();
         break;
+
+      case EVENTS.SPOTLIGHT_UPDATE:
+        if (!senderIsGM) break;
+        PacerManager.receiveSpotlightUpdate(payload.userId, payload.accrued, payload.activeSince);
+        break;
+
+      case EVENTS.SPOTLIGHT_RESET:
+        if (!senderIsGM) break;
+        PacerManager.receiveSpotlightReset();
+        break;
     }
   }
 
@@ -177,6 +189,14 @@ class SocketHandlerClass {
 
   emitDirePerilDismiss() {
     this._emit(EVENTS.DIRE_PERIL_DISMISS);
+  }
+
+  emitSpotlightUpdate(userId, accrued, activeSince) {
+    this._emit(EVENTS.SPOTLIGHT_UPDATE, { userId, accrued, activeSince });
+  }
+
+  emitSpotlightReset() {
+    this._emit(EVENTS.SPOTLIGHT_RESET);
   }
 }
 
