@@ -177,6 +177,17 @@ export function registerSettings() {
     }
   });
 
+  // Spotlight tracker state — world-scoped so totals survive a reload and are
+  // shared between co-GMs. Kept separate from pacerState so the pacer's
+  // "Reset all" and scene changes never wipe a session's spotlight tracking.
+  game.settings.register(MODULE_ID, 'spotlightState', {
+    name: 'Spotlight State',
+    scope: 'world',
+    config: false,
+    type: Object,
+    default: { players: {} }
+  });
+
   // Default countdown duration (1-10 minutes)
   // Pass raw i18n keys — Foundry localizes them lazily when the settings
   // sheet is rendered. Calling game.i18n.localize() here (during 'init')

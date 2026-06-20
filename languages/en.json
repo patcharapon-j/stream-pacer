@@ -66,6 +66,17 @@
     "DirePerilColumnLeft": "HAZARD / LETHAL / ENGAGED",
     "DirePerilColumnRight": "THREAT / RISK / ALERT",
 
+    "Spotlight": {
+      "Title": "Spotlight",
+      "ToggleTooltip": "Toggle this player in or out of the spotlight",
+      "UnderservedTooltip": "Underserved — well below the table's average spotlight time",
+      "NextUp": "Spotlight next",
+      "Deficit": "(−{pct}% vs avg)",
+      "ResetTooltip": "Reset all spotlight times",
+      "ResetTitle": "Reset Spotlight",
+      "ResetConfirm": "Clear every player's tracked spotlight time? This cannot be undone."
+    },
+
     "Settings": {
       "DefaultCountdown": "Default Countdown Duration",
       "DefaultCountdownHint": "Default duration in seconds for the countdown timer (1-10 minutes)",

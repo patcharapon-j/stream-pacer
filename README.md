@@ -15,6 +15,13 @@ A communication tool for GMs and players to signal scene readiness and pacing du
   - **Countdown** - Visual countdown timer for scene ending
   - **Floor Open** - Signal for players to raise their hands for actions
 
+- **Spotlight Tracker** (GM-only) - Track how much spotlight each player is getting so everyone gets a roughly equal share:
+  - Toggle players in or out of the current spotlight (multiple at once for shared scenes)
+  - Live per-player timers accrue real time to everyone currently in the light; the clock idles when nobody is toggled in
+  - Deficit bars scaled to the table leader, with an **underserved** flag for anyone well below the table average
+  - A **spotlight next** nudge naming the most-underserved player who is currently out of the scene
+  - Persists across reloads; reset only by its own deliberate button (never by scene changes or "Reset all")
+
 - **Real-Time Synchronization** - All players see status changes instantly via sockets
 
 - **Streaming Optimized** - Exempt specific users (like streaming overlay accounts) from seeing the UI
@@ -52,6 +59,7 @@ The Stream Pacer HUD appears on screen, allowing you to:
 - Start countdown timers for scene transitions
 - Open the floor for player actions
 - Reset all player statuses
+- Track spotlight distribution: toggle players in/out of the current scene and watch the deficit bars to see who needs more time in the light
 
 ## Settings
 
